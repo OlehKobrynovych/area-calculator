@@ -129,15 +129,21 @@ window.Calculations = {
   // L-shape area from 6 sides
   // A = top, B = right-top vertical, C = inner horizontal, D = inner vertical, E = bottom, F = left vertical
   calculateLShapeArea: function (sideA, sideB, sideC, sideD, sideE, sideF) {
-    // L-shape can be calculated as big rectangle minus cutout rectangle
-    // Big rectangle: sideA * sideF
-    // Cutout: sideC * (sideF - sideB)
-    // Or using shoelace formula for 6 vertices
-    // Area = sideA * sideF - sideC * sideD
-    if (sideA > 0 && sideF > 0) {
-      return sideA * sideF - sideC * sideD;
+    // Validate L-shape dimensions
+    // sideC must be less than sideA (inner width < outer width)
+    // sideD must be less than sideF (inner height < outer height)
+    if (sideC >= sideA || sideD >= sideF) {
+      console.warn("Invalid L-shape: inner dimensions must be smaller than outer");
+      return 0;
     }
-    return 0;
+
+    if (sideA <= 0 || sideF <= 0) {
+      return 0;
+    }
+
+    // L-shape = big rectangle minus cutout rectangle
+    // Area = sideA * sideF - sideC * sideD
+    return sideA * sideF - sideC * sideD;
   },
 
   // Triangle area using Heron's formula (from 3 sides)
@@ -156,11 +162,10 @@ window.Calculations = {
     return Math.PI * radius * radius;
   },
 
-  // Quadrilateral area (approximation)
-  calculateQuadrilateralArea: function (a, b, c, d) {
-    const s_a = (a + c) / 2;
-    const s_b = (b + d) / 2;
-    return s_a * s_b;
+  // Rectangle area (simple width * height)
+  // For general quadrilaterals, use shoelace formula with 4 points instead
+  calculateRectArea: function (width, height) {
+    return width * height;
   },
 
   // Calculate area for predefined shapes
@@ -174,11 +179,10 @@ window.Calculations = {
     try {
       switch (mode) {
         case "rectangle":
+          // For rectangle, use width * height (sides A and B)
           const sideA = getVal(dimensions.sideA);
           const sideB = getVal(dimensions.sideB);
-          const sideC = getVal(dimensions.sideC);
-          const sideD = getVal(dimensions.sideD);
-          areaCm2 = this.calculateQuadrilateralArea(sideA, sideB, sideC, sideD);
+          areaCm2 = this.calculateRectArea(sideA, sideB);
           break;
         case "l-shape":
           const lSideA = getVal(dimensions.sideA);
@@ -269,12 +273,8 @@ window.Calculations = {
       switch (currentShapeMode) {
         case "rectangle":
           if (sides.length === 4) {
-            areaVisualUnits = this.calculateQuadrilateralArea(
-              sides[0],
-              sides[1],
-              sides[2],
-              sides[3]
-            );
+            // For rectangle, use width * height (sides 0 and 1)
+            areaVisualUnits = this.calculateRectArea(sides[0], sides[1]);
           }
           break;
         case "l-shape":

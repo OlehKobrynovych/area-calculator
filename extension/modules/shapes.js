@@ -30,11 +30,31 @@ window.Shapes = {
 
     switch (mode) {
       case "l-shape":
-        const lOuterW = getVal(dimensions.outerWidth);
-        const lOuterH = getVal(dimensions.outerHeight);
-        const lInnerW = getVal(dimensions.innerWidth);
-        const lInnerH = getVal(dimensions.innerHeight);
-        return lOuterW > lInnerW && lOuterH > lInnerH;
+        // For L-shape with 6 sides: A (top), B (right-top), C (inner horizontal), D (inner vertical), E (bottom), F (left)
+        // Validation: C < A (inner width < outer width), D < F (inner height < outer height)
+        const sideA = getVal(dimensions.sideA);
+        const sideC = getVal(dimensions.sideC);
+        const sideD = getVal(dimensions.sideD);
+        const sideF = getVal(dimensions.sideF);
+        if (sideC >= sideA) {
+          console.warn("L-shape validation failed: sideC must be less than sideA");
+          return false;
+        }
+        if (sideD >= sideF) {
+          console.warn("L-shape validation failed: sideD must be less than sideF");
+          return false;
+        }
+        return true;
+      case "triangle":
+        // Triangle inequality: sum of any two sides must be greater than the third
+        const triA = getVal(dimensions.sideA);
+        const triB = getVal(dimensions.sideB);
+        const triC = getVal(dimensions.sideC);
+        if (triA + triB <= triC || triA + triC <= triB || triB + triC <= triA) {
+          console.warn("Triangle validation failed: invalid triangle sides");
+          return false;
+        }
+        return true;
       default:
         return true;
     }
@@ -432,6 +452,8 @@ window.Shapes = {
     // Update state points
     state.points = points;
 
+    // Update transform after geometry change
+    window.Drawing.updateTransform();
     window.Drawing.redrawCanvas();
 
     // Recalculate area based on new points
@@ -452,6 +474,12 @@ window.Shapes = {
 
     // Update other side lengths in inputs based on new points
     this.updateWallInputsFromPoints(changedIndex);
+
+    // Update originalPoints and originalWallLengths for the next edit
+    // This must be done AFTER updateWallInputsFromPoints so subsequent edits work from the new geometry
+    const newLengths = window.Calculations.calculateWallLengths(state.points);
+    state.originalPoints = state.points.map((p) => ({ x: p.x, y: p.y }));
+    state.originalWallLengths = newLengths.slice();
   },
 
   updateWallInputsFromPoints: function (skipIndex = -1) {
@@ -472,9 +500,9 @@ window.Shapes = {
       }
     });
 
-    // Update original points and lengths for next change
-    state.originalPoints = state.points.map((p) => ({ x: p.x, y: p.y }));
-    state.originalWallLengths = lengths.slice();
+    // NOTE: Do NOT update originalPoints here!
+    // originalPoints should only be set once when the shape is first closed
+    // Updating them here causes cumulative errors when editing multiple sides
   },
 
   calculateCentroid: function (points) {
@@ -694,6 +722,9 @@ window.Shapes = {
     // Set up as custom shape
     state.points = points;
     state.isShapeClosed = true;
+
+    // Update transform for the new shape
+    window.Drawing.updateTransform();
 
     // Create wall inputs using the unified custom shape system
     this.createWallInputsForCustomShape(points);

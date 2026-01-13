@@ -12,6 +12,11 @@ window.AppState = {
   mouseX: 0,
   mouseY: 0,
 
+  // Transform state (for coordinate system)
+  scale: 1,
+  offsetX: 0,
+  offsetY: 0,
+
   // Constants
   CM_TO_PX_SCALE: 1,
 
@@ -49,6 +54,10 @@ window.AppState = {
     this.isShapeClosed = false;
     this.shapeDimensions = {};
     this.customWallInputs = [];
+    // Reset transform
+    this.scale = 1;
+    this.offsetX = 0;
+    this.offsetY = 0;
     if (this.resultText) {
       this.resultText.textContent = "Будь ласка, виберіть фігуру або намалюйте її.";
     }
