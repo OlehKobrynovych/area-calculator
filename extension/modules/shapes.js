@@ -295,6 +295,13 @@ window.Shapes = {
       case "circle": {
         const circRadius_val = getVal(dimensions.radius);
         const circRadius = circRadius_val * CM_TO_PX;
+
+        // Auto-scale circle to fit canvas
+        const padding = 40;
+        const availableSize = Math.min(canvas.width, canvas.height) - padding * 2;
+        const scale = circRadius > 0 ? Math.min(1, availableSize / (circRadius * 2)) : 1;
+        const scaledRadius = circRadius * scale;
+
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
 
@@ -303,14 +310,14 @@ window.Shapes = {
         ctx.strokeStyle = shapeStrokeColor;
         ctx.lineWidth = lineWidth;
         ctx.beginPath();
-        ctx.arc(centerX, centerY, circRadius, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, scaledRadius, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
         // Draw radius line
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
-        ctx.lineTo(centerX + circRadius, centerY);
+        ctx.lineTo(centerX + scaledRadius, centerY);
         ctx.stroke();
 
         // Draw label
@@ -321,8 +328,8 @@ window.Shapes = {
         const unitTextCirc = state.shapeUnit === "m" ? "м" : "см";
         ctx.fillText(
           `R: ${circRadius_val}${unitTextCirc}`,
-          centerX + circRadius / 2,
-          centerY - 10
+          centerX + scaledRadius / 2,
+          centerY - 15
         );
         break;
       }
