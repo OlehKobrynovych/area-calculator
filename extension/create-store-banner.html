@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Calculator - Store Banner Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .preview {
+            border: 2px solid #ddd;
+            margin: 20px 0;
+            display: inline-block;
+            max-width: 100%;
+            height: auto;
+        }
+        button {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #166fe5;
+        }
+        .instructions {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .dimensions {
+            background: #f0f7ff;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Area Calculator - Store Banner Generator</h1>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <p>1. Click "Generate Store Banner" to create the promotional image</p>
+            <p>2. Right-click the banner and "Save image as..."</p>
+            <p>3. Save as PNG (1400x560 pixels)</p>
+            <div class="dimensions">Required size: 1400 x 560 pixels</div>
+        </div>
+
+        <canvas id="banner" width="1400" height="560" class="preview"></canvas>
+        
+        <div>
+            <button onclick="generateBanner()">Generate Store Banner</button>
+            <button onclick="downloadBanner()">Download PNG</button>
+        </div>
+    </div>
+
+    <script>
+        function generateBanner() {
+            const canvas = document.getElementById('banner');
+            const ctx = canvas.getContext('2d');
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, 1400, 560);
+            gradient.addColorStop(0, '#1877f2');
+            gradient.addColorStop(0.5, '#2e7cd6');
+            gradient.addColorStop(1, '#0e5fc7');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 1400, 560);
+            
+            // Grid pattern
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 1400; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, 560);
+                ctx.stroke();
+            }
+            for (let i = 0; i < 560; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(1400, i);
+                ctx.stroke();
+            }
+            
+            // Large white content area
+            ctx.fillStyle = 'white';
+            ctx.roundRect(60, 60, 1280, 440, 20);
+            ctx.fill();
+            
+            // Left section - Title and description
+            ctx.fillStyle = '#1877f2';
+            ctx.font = 'bold 72px Segoe UI';
+            ctx.textAlign = 'left';
+            ctx.fillText('Area Calculator', 100, 150);
+            
+            ctx.fillStyle = '#333';
+            ctx.font = '36px Segoe UI';
+            ctx.fillText('Calculate Areas & Materials', 100, 200);
+            
+            ctx.fillStyle = '#666';
+            ctx.font = '24px Segoe UI';
+            ctx.fillText('Perfect for architects, designers, and construction', 100, 240);
+            ctx.fillText('Visual drawing tool with 6 shape types', 100, 280);
+            
+            // Features list
+            const features = [
+                'Visual Canvas Drawing',
+                '6 Shape Types (Square, Rectangle, Triangle, L-shape, Circle, Custom)',
+                'Material Calculator for Renovation',
+                'Multi-language Support (EN/UK)',
+                'Unit Conversion (cm/m)',
+                'Real-time Area Calculation'
+            ];
+            
+            ctx.fillStyle = '#444';
+            ctx.font = '20px Segoe UI';
+            features.forEach((feature, index) => {
+                ctx.fillText('   ' + feature, 100, 330 + index * 25);
+            });
+            
+            // Right section - Visual elements
+            ctx.fillStyle = '#f0f7ff';
+            ctx.roundRect(800, 120, 480, 320, 15);
+            ctx.fill();
+            
+            // Draw large shapes
+            ctx.strokeStyle = '#1877f2';
+            ctx.lineWidth = 8;
+            ctx.fillStyle = '#1877f2';
+            
+            // Large square
+            ctx.strokeRect(850, 160, 80, 80);
+            
+            // Large triangle
+            ctx.beginPath();
+            ctx.moveTo(980, 240);
+            ctx.lineTo(1020, 160);
+            ctx.lineTo(1060, 240);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Large circle
+            ctx.beginPath();
+            ctx.arc(1140, 200, 40, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Large L-shape
+            ctx.beginPath();
+            ctx.moveTo(850, 320);
+            ctx.lineTo(850, 400);
+            ctx.lineTo(930, 400);
+            ctx.lineTo(930, 360);
+            ctx.lineTo(890, 360);
+            ctx.lineTo(890, 320);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Large rectangle
+            ctx.strokeRect(980, 340, 120, 60);
+            
+            // Calculator icon
+            ctx.fillStyle = '#1877f2';
+            ctx.font = '48px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('=', 1180, 370);
+            
+            // Bottom section - Call to action
+            ctx.fillStyle = '#1877f2';
+            ctx.font = 'bold 32px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('Install Now - Free on Chrome Web Store', 700, 480);
+            
+            // Chrome Web Store badge
+            ctx.fillStyle = '#4285f4';
+            ctx.font = 'bold 24px Segoe UI';
+            ctx.fillText('Available on Chrome Web Store', 700, 520);
+            
+            // Decorative elements
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 4;
+            
+            // Top decorative line
+            ctx.beginPath();
+            ctx.moveTo(100, 100);
+            ctx.lineTo(600, 100);
+            ctx.stroke();
+            
+            // Bottom decorative line
+            ctx.beginPath();
+            ctx.moveTo(800, 100);
+            ctx.lineTo(1300, 100);
+            ctx.stroke();
+        }
+        
+        function downloadBanner() {
+            const canvas = document.getElementById('banner');
+            const link = document.createElement('a');
+            link.download = 'area-calculator-store-banner.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Auto-generate on load
+        window.onload = generateBanner;
+    </script>
+</body>
+</html>

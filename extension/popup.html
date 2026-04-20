@@ -3,12 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Калькулятор площі</title>
+  <title>Area Calculator</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container">
-    <h1 class="main-title">Калькулятор площі</h1>
+    <div class="header-row">
+      <h1 class="main-title" data-i18n="title">Area Calculator</h1>
+      <select id="lang-select">
+        <option value="en" selected>EN</option>
+        <option value="uk">UK</option>
+      </select>
+    </div>
 
     <!-- Shape Selection -->
     <div class="section">
@@ -16,27 +22,27 @@
         <div class="shape-buttons" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
           <button class="shape-btn active" data-shape="custom">
             <span class="shape-icon">✏️</span>
-            <span class="shape-text">Довільна</span>
+            <span class="shape-text" data-i18n="shape_custom">Довільна</span>
           </button>
           <button class="shape-btn" data-shape="square">
             <span class="shape-icon">⬜</span>
-            <span class="shape-text">Квадрат</span>
+            <span class="shape-text" data-i18n="shape_square">Квадрат</span>
           </button>
           <button class="shape-btn" data-shape="rectangle">
             <span class="shape-icon">▭</span>
-            <span class="shape-text">Прямокутник</span>
+            <span class="shape-text" data-i18n="shape_rectangle">Прямокутник</span>
           </button>
           <button class="shape-btn" data-shape="triangle">
             <span class="shape-icon">▲</span>
-            <span class="shape-text">Трикутник</span>
+            <span class="shape-text" data-i18n="shape_triangle">Трикутник</span>
           </button>
           <button class="shape-btn" data-shape="l-shape">
             <span class="shape-icon">⌞</span>
-            <span class="shape-text">Г-подібна</span>
+            <span class="shape-text" data-i18n="shape_l_shape">Г-подібна</span>
           </button>
           <button class="shape-btn" data-shape="circle">
             <span class="shape-icon">⭕</span>
-            <span class="shape-text">Круг</span>
+            <span class="shape-text" data-i18n="shape_circle">Круг</span>
           </button>
         </div>
       </div>
@@ -44,15 +50,12 @@
 
     <!-- Global Unit Selection -->
     <div class="section" id="global-unit-section">
-      <div class="unit-label">Одиниці виміру:</div>
-      <div class="unit-radio-group">
-        <label class="radio-label">
-          <input type="radio" name="shape-unit" value="cm" checked>
-          <span>Сантиметри (см)</span>
+      <div class="unit-radio-group" style="display: flex; gap: 20px; justify-content: center; margin-bottom: 15px;">
+        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+          <input type="radio" name="shape-unit" value="cm" checked> <span data-i18n="unit_cm">см</span>
         </label>
-        <label class="radio-label">
-          <input type="radio" name="shape-unit" value="m">
-          <span>Метри (м)</span>
+        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+          <input type="radio" name="shape-unit" value="m"> <span data-i18n="unit_m">м</span>
         </label>
       </div>
     </div>
@@ -61,7 +64,7 @@
     <div class="section" id="drawing-section">
       <canvas id="canvas" width="400" height="300"></canvas>
       <div class="canvas-controls" id="canvas-buttons" style="display: flex; justify-content: center; margin-top: 10px;">
-        <button id="clear-btn" style="padding: 8px 20px; background: #ffebee; color: #d32f2f; border: 1px solid #ffcdd2; border-radius: 6px; cursor: pointer;">Очистити</button>
+        <button id="clear-btn" style="padding: 8px 20px; background: #ffebee; color: #d32f2f; border: 1px solid #ffcdd2; border-radius: 6px; cursor: pointer;" data-i18n="btn_clear">Очистити</button>
       </div>
     </div>
 
@@ -69,7 +72,7 @@
     <div class="section" id="inputs-section">
       <div id="custom-sides-config" style="display: block;">
         <div class="input-group">
-          <label for="sides-count">Кількість сторін:</label>
+          <label for="sides-count" data-i18n="label_sides_count">Кількість сторін:</label>
           <div style="display: flex; gap: 10px; align-items: center;">
             <input type="number" id="sides-count" min="3" max="20" value="4">
             <button id="confirm-sides">OK</button>
@@ -81,27 +84,27 @@
 
     <!-- Results Display -->
     <div class="section result-section" style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px; text-align: center;">
-      <div id="area-result" class="result-text" style="font-weight: 600; color: #1877f2;">Будь ласка, введіть параметри фігури.</div>
+      <div id="area-result" class="result-text" style="font-weight: 600; color: #1877f2;" data-i18n="hint_init">Будь ласка, введіть параметри фігури.</div>
     </div>
 
     <!-- Material Calculation Section -->
     <div class="section material-section" style="margin-top: 25px; border-top: 1px solid #eee; padding-top: 20px;">
-      <h2 style="font-size: 18px; margin-bottom: 15px;">Розрахунок матеріалу</h2>
+      <h2 style="font-size: 18px; margin-bottom: 15px;" data-i18n="material_title">Розрахунок матеріалу</h2>
       <div class="input-group">
-        <label>Ширина (см):</label>
-        <input type="number" id="material-width" placeholder="Введіть">
+        <label><span data-i18n="mat_width">Ширина</span> (<span data-i18n="unit_cm_short">см</span>):</label>
+        <input type="number" id="material-width" placeholder="30">
       </div>
       <div class="input-group">
-        <label>Довжина (см):</label>
-        <input type="number" id="material-height" placeholder="Введіть">
+        <label><span data-i18n="mat_height">Довжина</span> (<span data-i18n="unit_cm_short">см</span>):</label>
+        <input type="number" id="material-height" placeholder="30">
       </div>
       <div class="input-group">
-        <label>В упаковці:</label>
-        <input type="number" id="units-per-pack" placeholder="Кількість">
+        <label data-i18n="mat_per_pack">В упаковці:</label>
+        <input type="number" id="units-per-pack" placeholder="10">
       </div>
       <div class="input-group">
-        <label>Ціна (грн):</label>
-        <input type="number" id="material-price" placeholder="Ціна">
+        <label><span data-i18n="mat_price">Ціна</span> (<span data-i18n="unit_currency">грн</span>):</label>
+        <input type="number" id="material-price" placeholder="500">
       </div>
       
       <div id="material-result" class="material-result"></div>
