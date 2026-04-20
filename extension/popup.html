@@ -8,30 +8,51 @@
 </head>
 <body>
   <div class="container">
-    <h1>Калькулятор площі</h1>
+    <h1 class="main-title">Калькулятор площі</h1>
 
     <!-- Shape Selection -->
     <div class="section">
       <div class="shape-selection" id="shape-buttons">
         <div class="shape-buttons" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
-          <button class="shape-btn active" data-shape="custom">Довільна</button>
-          <button class="shape-btn" data-shape="square">Квадрат</button>
-          <button class="shape-btn" data-shape="rectangle">Прямокутник</button>
-          <button class="shape-btn" data-shape="triangle">Трикутник</button>
-          <button class="shape-btn" data-shape="l-shape">Г-подібна</button>
-          <button class="shape-btn" data-shape="circle">Круг</button>
+          <button class="shape-btn active" data-shape="custom">
+            <span class="shape-icon">✏️</span>
+            <span class="shape-text">Довільна</span>
+          </button>
+          <button class="shape-btn" data-shape="square">
+            <span class="shape-icon">⬜</span>
+            <span class="shape-text">Квадрат</span>
+          </button>
+          <button class="shape-btn" data-shape="rectangle">
+            <span class="shape-icon">▭</span>
+            <span class="shape-text">Прямокутник</span>
+          </button>
+          <button class="shape-btn" data-shape="triangle">
+            <span class="shape-icon">▲</span>
+            <span class="shape-text">Трикутник</span>
+          </button>
+          <button class="shape-btn" data-shape="l-shape">
+            <span class="shape-icon">⌞</span>
+            <span class="shape-text">Г-подібна</span>
+          </button>
+          <button class="shape-btn" data-shape="circle">
+            <span class="shape-icon">⭕</span>
+            <span class="shape-text">Круг</span>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Global Unit Selection -->
     <div class="section" id="global-unit-section">
-      <div class="radio-group" style="display: flex; gap: 20px; justify-content: center; margin-bottom: 15px;">
-        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-          <input type="radio" name="shape-unit" value="cm" checked> см
+      <div class="unit-label">Одиниці виміру:</div>
+      <div class="unit-radio-group">
+        <label class="radio-label">
+          <input type="radio" name="shape-unit" value="cm" checked>
+          <span>Сантиметри (см)</span>
         </label>
-        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-          <input type="radio" name="shape-unit" value="m"> м
+        <label class="radio-label">
+          <input type="radio" name="shape-unit" value="m">
+          <span>Метри (м)</span>
         </label>
       </div>
     </div>
@@ -68,22 +89,22 @@
       <h2 style="font-size: 18px; margin-bottom: 15px;">Розрахунок матеріалу</h2>
       <div class="input-group">
         <label>Ширина (см):</label>
-        <input type="number" id="material-width" placeholder="30">
+        <input type="number" id="material-width" placeholder="Введіть">
       </div>
       <div class="input-group">
         <label>Довжина (см):</label>
-        <input type="number" id="material-height" placeholder="30">
+        <input type="number" id="material-height" placeholder="Введіть">
       </div>
       <div class="input-group">
         <label>В упаковці:</label>
-        <input type="number" id="units-per-pack" placeholder="10">
+        <input type="number" id="units-per-pack" placeholder="Кількість">
       </div>
       <div class="input-group">
         <label>Ціна (грн):</label>
-        <input type="number" id="material-price" placeholder="500">
+        <input type="number" id="material-price" placeholder="Ціна">
       </div>
       
-      <div id="material-result" class="material-result" style="margin-top: 15px; font-size: 14px; line-height: 1.5; color: #444;"></div>
+      <div id="material-result" class="material-result"></div>
     </div>
   </div>
 

@@ -5,7 +5,7 @@ window.AppState = {
   isShapeClosed: false,
   currentShapeMode: "custom", // "custom", "triangle", "circle"
   shapeUnit: "cm", // "cm", "m"
-  
+
   // Viewport/Canvas transform
   scale: 1,
   offsetX: 0,
@@ -32,7 +32,7 @@ window.AppState = {
   shapeInputs: null,
   resultText: null,
   materialResultDisplay: null,
-  
+
   // New DOM References
   customSidesConfig: null,
   sidesCountInput: null,
@@ -48,13 +48,13 @@ window.AppState = {
     this.offsetX = 0;
     this.offsetY = 0;
     if (this.resultText) {
-      this.resultText.textContent = "Будь ласка, виберіть фігуру або намалюйте її.";
+      this.resultText.textContent = "Будь ласка, виберіть фігуру.";
     }
     if (this.dynamicInputsContainer) {
       this.dynamicInputsContainer.innerHTML = "";
     }
     if (this.materialResultDisplay) {
-        this.materialResultDisplay.innerHTML = "";
+      this.materialResultDisplay.innerHTML = "";
     }
-  }
+  },
 };

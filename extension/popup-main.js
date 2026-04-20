@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   state.shapeInputs = document.getElementById("inputs-section");
   state.resultText = document.getElementById("area-result");
   state.materialResultDisplay = document.getElementById("material-result");
-  
+
   state.customSidesConfig = document.getElementById("custom-sides-config");
   state.sidesCountInput = document.getElementById("sides-count");
   state.confirmSidesBtn = document.getElementById("confirm-sides");
@@ -27,7 +27,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const updateMaterialCalculation = () => {
     // Clamp to 0 to prevent negative values
     const width = Math.max(0, parseFloat(state.materialWidthInput.value) || 0);
-    const height = Math.max(0, parseFloat(state.materialHeightInput.value) || 0);
+    const height = Math.max(
+      0,
+      parseFloat(state.materialHeightInput.value) || 0,
+    );
     const perPack = Math.max(0, parseInt(state.unitsPerPackInput.value) || 0);
     const price = Math.max(0, parseFloat(state.materialPriceInput.value) || 0);
 
@@ -39,14 +42,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (width <= 0 || height <= 0 || state.shapeArea <= 0) {
       state.materialResultDisplay.innerHTML = "";
+      state.materialResultDisplay.style.display = "none";
       return;
     }
 
     const result = window.Calculations.calculateMaterialRequirements(
-      state.shapeArea, width, height, perPack
+      state.shapeArea,
+      width,
+      height,
+      perPack,
     );
 
     if (result) {
+      state.materialResultDisplay.style.display = "block";
       let html = `<p>Вам знадобиться: <strong>${result.unitsNeeded}</strong> шт.</p>`;
       if (perPack > 0) {
         html += `<p>Кількість упаковок: <strong>${result.packsNeeded}</strong></p>`;
@@ -68,7 +76,9 @@ document.addEventListener("DOMContentLoaded", () => {
   state.shapeButtonsContainer.addEventListener("click", (e) => {
     const btn = e.target.closest(".shape-btn");
     if (btn) {
-      document.querySelectorAll(".shape-btn").forEach(b => b.classList.remove("active"));
+      document
+        .querySelectorAll(".shape-btn")
+        .forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       window.UI.handleShapeButtonClick(btn.dataset.shape);
       updateMaterialCalculation();
@@ -76,12 +86,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Global Unit Change
-  document.querySelectorAll('input[name="shape-unit"]').forEach(radio => {
+  document.querySelectorAll('input[name="shape-unit"]').forEach((radio) => {
     radio.addEventListener("change", (e) => {
       const oldUnit = state.shapeUnit;
       const newUnit = e.target.value;
       state.shapeUnit = newUnit;
-      
+
       // If we switch units, we keep the numbers but the "real" size in CM changes
       // cm -> m: 10cm becomes 10m (1000cm) -> factor 100
       // m -> cm: 10m becomes 10cm -> factor 0.01
@@ -90,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (oldUnit === "m" && newUnit === "cm") factor = 0.01;
 
       if (state.points.length > 0) {
-        state.points.forEach(p => {
+        state.points.forEach((p) => {
           p.x *= factor;
           p.y *= factor;
         });
@@ -101,34 +111,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
       window.Drawing.updateTransform();
       window.Drawing.redrawCanvas();
-      
+
       // Area needs to be recalculated because points/radius changed
       if (state.currentShapeMode === "circle") {
-          state.shapeArea = window.Calculations.calculateCircleArea(state.circleRadius);
+        state.shapeArea = window.Calculations.calculateCircleArea(
+          state.circleRadius,
+        );
       } else {
-          state.shapeArea = window.Calculations.calculatePolygonArea(state.points);
+        state.shapeArea = window.Calculations.calculatePolygonArea(
+          state.points,
+        );
       }
 
       window.UI.updateResultText();
-      
+
       // Refresh inputs to update labels (e.g. "cm" -> "m")
       if (state.currentShapeMode === "circle") {
         window.UI.createCircleInput();
       } else if (state.points.length > 0) {
         window.UI.createSideInputs(state.points);
       }
-      
+
       updateMaterialCalculation();
     });
   });
 
   // Canvas Controls
-  state.canvas.addEventListener("mousedown", (e) => window.Drawing.handleMouseDown(e));
-  window.addEventListener("mousemove", (e) => window.Drawing.handleMouseMove(e));
+  state.canvas.addEventListener("mousedown", (e) =>
+    window.Drawing.handleMouseDown(e),
+  );
+  window.addEventListener("mousemove", (e) =>
+    window.Drawing.handleMouseMove(e),
+  );
   window.addEventListener("mouseup", () => window.Drawing.handleMouseUp());
 
   // Listen for internal shape changes to update material
-  document.addEventListener('shapeChanged', updateMaterialCalculation);
+  document.addEventListener("shapeChanged", updateMaterialCalculation);
 
   document.getElementById("clear-btn").addEventListener("click", () => {
     state.reset();
@@ -142,7 +160,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Material Inputs
-  [state.materialWidthInput, state.materialHeightInput, state.unitsPerPackInput, state.materialPriceInput].forEach(input => {
+  [
+    state.materialWidthInput,
+    state.materialHeightInput,
+    state.unitsPerPackInput,
+    state.materialPriceInput,
+  ].forEach((input) => {
     input.addEventListener("input", updateMaterialCalculation);
   });
 
