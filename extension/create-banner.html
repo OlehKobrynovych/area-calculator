@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Calculator - Banner Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .preview {
+            border: 2px solid #ddd;
+            margin: 20px 0;
+            display: inline-block;
+        }
+        button {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #166fe5;
+        }
+        .instructions {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Area Calculator - Banner Generator</h1>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <p>1. Click "Generate Banner" to create the promotional image</p>
+            <p>2. Right-click the banner and "Save image as..."</p>
+            <p>3. Save as PNG (440x280 pixels)</p>
+        </div>
+
+        <canvas id="banner" width="440" height="280" class="preview"></canvas>
+        
+        <div>
+            <button onclick="generateBanner()">Generate Banner</button>
+            <button onclick="downloadBanner()">Download PNG</button>
+        </div>
+    </div>
+
+    <script>
+        function generateBanner() {
+            const canvas = document.getElementById('banner');
+            const ctx = canvas.getContext('2d');
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, 440, 280);
+            gradient.addColorStop(0, '#1877f2');
+            gradient.addColorStop(1, '#0e5fc7');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 440, 280);
+            
+            // Grid pattern
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 440; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, 280);
+                ctx.stroke();
+            }
+            for (let i = 0; i < 280; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(440, i);
+                ctx.stroke();
+            }
+            
+            // White content area
+            ctx.fillStyle = 'white';
+            ctx.roundRect(20, 20, 400, 240, 15);
+            ctx.fill();
+            
+            // Title
+            ctx.fillStyle = '#1877f2';
+            ctx.font = 'bold 32px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('Area Calculator', 220, 70);
+            
+            // Subtitle
+            ctx.fillStyle = '#666';
+            ctx.font = '18px Segoe UI';
+            ctx.fillText('Calculate Areas & Materials', 220, 100);
+            
+            // Icons area
+            ctx.fillStyle = '#f0f7ff';
+            ctx.roundRect(40, 120, 360, 80, 10);
+            ctx.fill();
+            
+            // Draw shapes
+            ctx.strokeStyle = '#1877f2';
+            ctx.lineWidth = 3;
+            ctx.fillStyle = '#1877f2';
+            
+            // Square
+            ctx.strokeRect(60, 140, 30, 30);
+            
+            // Triangle
+            ctx.beginPath();
+            ctx.moveTo(120, 170);
+            ctx.lineTo(135, 140);
+            ctx.lineTo(150, 170);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Circle
+            ctx.beginPath();
+            ctx.arc(195, 155, 15, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // L-shape
+            ctx.beginPath();
+            ctx.moveTo(240, 140);
+            ctx.lineTo(240, 170);
+            ctx.lineTo(270, 170);
+            ctx.lineTo(270, 160);
+            ctx.lineTo(250, 160);
+            ctx.lineTo(250, 140);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Rectangle
+            ctx.strokeRect(300, 145, 40, 25);
+            
+            // Features
+            ctx.fillStyle = '#333';
+            ctx.font = '14px Segoe UI';
+            ctx.textAlign = 'left';
+            ctx.fillText('Visual Drawing', 60, 220);
+            ctx.fillText('6 Shape Types', 60, 240);
+            ctx.fillText('Material Calculator', 240, 220);
+            ctx.fillText('Multi-language', 240, 240);
+            
+            // Chrome Web Store badge
+            ctx.fillStyle = '#4285f4';
+            ctx.font = 'bold 12px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('Available on Chrome Web Store', 220, 265);
+        }
+        
+        function downloadBanner() {
+            const canvas = document.getElementById('banner');
+            const link = document.createElement('a');
+            link.download = 'area-calculator-banner.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Auto-generate on load
+        window.onload = generateBanner;
+    </script>
+</body>
+</html>

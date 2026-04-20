@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Калькулятор площі",
+  "name": "Area Calculator",
   "version": "1.0.0",
-  "description": "Обчислення площі різних фігур",
+  "description": "Calculating the area of ​​various shapes",
   "permissions": ["storage", "activeTab", "scripting", "windows"],
   "action": {
     "default_icon": {
@@ -10,7 +10,7 @@
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     },
-    "default_title": "Калькулятор площі"
+    "default_title": "Area Calculator"
   },
   "background": {
     "service_worker": "background.js"

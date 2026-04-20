@@ -5,9 +5,9 @@ window.AppState = {
   isShapeClosed: false,
   currentShapeMode: "custom", // "custom", "triangle", "circle"
   shapeUnit: "cm", // "cm", "m"
+  currentLanguage: "en", // "uk", "en"
 
-  // Viewport/Canvas transform
-  scale: 1,
+  // Viewport/Canvas transform  scale: 1,
   offsetX: 0,
   offsetY: 0,
   mouseX: 0,
