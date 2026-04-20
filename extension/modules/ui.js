@@ -1,181 +1,153 @@
 // UI management module
 window.UI = {
-  // Create input field
-  createInputField: function (id, label, type, value, min) {
-    type = type || "number";
-    value = value || "";
-    min = min || 0;
-
-    const div = document.createElement("div");
-    div.classList.add("input-group");
-
-    const labelElem = document.createElement("label");
-    labelElem.setAttribute("for", id);
-    labelElem.textContent = label;
-
-    const inputElem = document.createElement("input");
-    inputElem.type = type;
-    inputElem.id = id;
-    inputElem.value = Math.round(parseFloat(value)) || 0; // Ensure integer value
-    inputElem.min = min;
-    inputElem.step = "1";
-
-    div.appendChild(labelElem);
-    div.appendChild(inputElem);
-
-    return inputElem;
-  },
-
-  // Generate shape inputs for circle only (other shapes use unified point system)
-  generateShapeInputs: function (mode) {
+  // Update result text display
+  updateResultText: function() {
     const state = window.AppState;
-    state.shapeInputs.innerHTML = "";
-    state.shapeDimensions = {};
-
-    // Only circle uses the old system
-    if (mode !== "circle") {
-      return;
-    }
-
-    const defaults = window.Shapes.getDefaultDimensions(mode);
-    const commonInputHandler = this.handleShapeInputChange.bind(this);
-    const unitText = state.shapeUnit === "m" ? "м" : "см";
-
-    const inputElem = this.createInputField(
-      "circ-side-r",
-      `Радіус R (${unitText})`,
-      "number",
-      defaults.radius
-    );
-    state.shapeInputs.appendChild(inputElem.parentNode);
-    state.shapeDimensions.radius = inputElem;
-    inputElem.addEventListener("input", commonInputHandler);
-
-    // Initial calculation and draw for circle
-    this.handleShapeInputChange();
-  },
-
-  // Handle shape input change
-  handleShapeInputChange: function () {
-    const state = window.AppState;
-
-    // Calculate area
-    state.shapeArea = window.Calculations.calculatePredefinedShapeArea(
-      state.currentShapeMode,
-      state.shapeDimensions
-    );
-
-    // Redraw shape
-    window.Drawing.redrawCanvas();
-
-    // Update result text
     if (state.shapeArea > 0) {
-      state.resultText.textContent = `Площа фігури: ${(
-        state.shapeArea / 10000
-      ).toFixed(2)} м². Готово до розрахунку.`;
+      const unit = state.shapeUnit === "m" ? "м²" : "см²";
+      const area = state.shapeUnit === "m" ? state.shapeArea / 10000 : state.shapeArea;
+      state.resultText.textContent = `Площа фігури: ${area.toFixed(2)} ${unit}. Готово до розрахунку.`;
     } else {
       state.resultText.textContent = "Будь ласка, введіть дійсні розміри.";
     }
   },
 
-  // Update shape UI visibility
-  updateShapeUI: function () {
+  // Update existing input values without recreating DOM (prevents focus loss)
+  syncSideInputs: function() {
     const state = window.AppState;
-
-    // Drawing section always visible
-    state.drawingSection.style.display = "block";
-    state.canvas.style.display = "block";
-
-    if (state.currentShapeMode === "custom") {
-      state.drawInstruction.style.display = "block";
-      state.canvasButtons.style.display = "flex";
-      // Show unit section and inputs only if shape is closed
-      if (state.isShapeClosed) {
-        state.shapeInputs.style.display = "block";
-        state.shapeUnitSection.style.display = "block";
-      } else {
-        state.shapeInputs.style.display = "none";
-        state.shapeUnitSection.style.display = "none";
+    const multiplier = state.shapeUnit === "m" ? 100 : 1;
+    
+    state.points.forEach((p1, i) => {
+      const p2 = state.points[(i + 1) % state.points.length];
+      const len = window.Calculations.calculateDistance(p1, p2);
+      const input = document.getElementById(`side-input-${i}`);
+      if (input && document.activeElement !== input) {
+        input.value = (len / multiplier).toFixed(2);
       }
-    } else if (state.currentShapeMode === "circle") {
-      // Circle uses old system (no points)
-      state.drawInstruction.style.display = "none";
-      state.canvasButtons.style.display = "none";
-      state.shapeInputs.style.display = "block";
-      state.shapeUnitSection.style.display = "block";
-      this.generateShapeInputs(state.currentShapeMode);
-    } else {
-      // Rectangle, L-shape, Triangle - use unified custom shape system
-      state.drawInstruction.style.display = "none";
-      state.canvasButtons.style.display = "none";
-      state.shapeInputs.style.display = "block";
-      state.shapeUnitSection.style.display = "block";
-
-      // Initialize as custom shape with generated points
-      window.Shapes.initPredefinedAsCustom(state.currentShapeMode);
-
-      // Immediately calculate and display area for predefined shapes
-      const pixelArea = window.Calculations.calculateCustomShapeArea(
-        state.points
-      );
-      const areaCm2 = pixelArea / (state.CM_TO_PX_SCALE * state.CM_TO_PX_SCALE);
-      if (areaCm2 > 0) {
-        state.shapeArea = areaCm2;
-        state.resultText.textContent = `Площа фігури: ${(
-          areaCm2 / 10000
-        ).toFixed(2)} м². Готово до розрахунку.`;
-      }
-    }
-
-    window.Drawing.redrawCanvas();
-  },
-
-  // Update shape input labels based on unit
-  updateShapeLabels: function (unit) {
-    const unitText = unit === "m" ? "м" : "см";
-    const state = window.AppState;
-
-    // Update labels in shape inputs
-    const labels = state.shapeInputs.querySelectorAll("label");
-    labels.forEach((label) => {
-      const text = label.textContent;
-      // Replace unit in parentheses: (см) or (м)
-      label.textContent = text.replace(/\(см\)|\(м\)/g, `(${unitText})`);
     });
   },
 
-  // Recalculate area after unit change (points stay the same visually)
-  recalculatePointsFromInputs: function () {
+  // Create side inputs dynamically
+  createSideInputs: function(points) {
     const state = window.AppState;
+    state.dynamicInputsContainer.innerHTML = "";
+    const unit = state.shapeUnit === "m" ? "м" : "см";
+    const multiplier = state.shapeUnit === "m" ? 100 : 1;
 
-    if (state.currentShapeMode === "circle") {
-      // Circle uses old system, just redraw
-      this.handleShapeInputChange();
-      return;
+    points.forEach((p1, i) => {
+      const p2 = points[(i + 1) % points.length];
+      const len = window.Calculations.calculateDistance(p1, p2);
+      const displayVal = (len / multiplier).toFixed(2);
+      
+      const div = document.createElement("div");
+      div.classList.add("input-group");
+      const label = document.createElement("label");
+      const sideLetter = String.fromCharCode(65 + i);
+      label.textContent = `Сторона ${sideLetter} (${unit}):`;
+      
+      const input = document.createElement("input");
+      input.type = "number";
+      input.id = `side-input-${i}`;
+      input.value = displayVal;
+      input.step = "0.01";
+      
+      input.addEventListener("change", (e) => {
+        const newVal = parseFloat(e.target.value) || 0;
+        window.Shapes.handleSideLengthChange(i, newVal * multiplier);
+        // Sync other inputs (like opposite sides) without focus loss
+        this.syncSideInputs();
+      });
+      
+      div.appendChild(label);
+      div.appendChild(input);
+      state.dynamicInputsContainer.appendChild(div);
+    });
+  },
+
+  // Handle shape button clicks
+  handleShapeButtonClick: function(shape) {
+    const state = window.AppState;
+    state.reset();
+    state.currentShapeMode = shape;
+    
+    state.customSidesConfig.style.display = "none";
+    state.canvasButtons.style.display = "none"; 
+
+    const m = state.shapeUnit === "m" ? 100 : 1;
+
+    if (shape === "custom") {
+      state.customSidesConfig.style.display = "block";
+      state.canvasButtons.style.display = "flex"; 
+    } else if (shape === "square") {
+      state.points = window.Shapes.generateRectangle(1 * m, 1 * m);
+      state.isShapeClosed = true;
+    } else if (shape === "rectangle") {
+      state.points = window.Shapes.generateRectangle(2 * m, 1 * m);
+      state.isShapeClosed = true;
+    } else if (shape === "triangle") {
+      state.points = window.Shapes.generateTriangle(1 * m);
+      state.isShapeClosed = true;
+    } else if (shape === "l-shape") {
+      state.points = window.Shapes.generateLShape(2 * m, 2 * m, 1 * m, 1 * m);
+      state.isShapeClosed = true;
+    } else if (shape === "circle") {
+      state.circleRadius = 0.5 * m;
+      this.createCircleInput();
     }
 
-    // Points stay the same on canvas - only the interpretation changes
-    // Just redraw to update labels with new unit
+    if (shape !== "circle" && state.points.length > 0) {
+      window.Drawing.updateTransform(true);
+      this.createSideInputs(state.points);
+      state.shapeArea = window.Calculations.calculatePolygonArea(state.points);
+    } else if (shape === "circle") {
+      state.shapeArea = window.Calculations.calculateCircleArea(state.circleRadius);
+    }
+    
+    this.updateResultText();
     window.Drawing.redrawCanvas();
   },
 
-  // Handle shape button click
-  handleShapeButtonClick: function (shape) {
+  createCircleInput: function() {
     const state = window.AppState;
+    state.dynamicInputsContainer.innerHTML = "";
+    const unit = state.shapeUnit === "m" ? "м" : "см";
+    const multiplier = state.shapeUnit === "m" ? 100 : 1;
+    const displayVal = (state.circleRadius / multiplier).toFixed(2);
 
-    // Update active button
-    document
-      .querySelectorAll(".shape-btn")
-      .forEach((btn) => btn.classList.remove("active"));
-    document
-      .querySelector(`.shape-btn[data-shape="${shape}"]`)
-      .classList.add("active");
-
-    // Update state
-    state.currentShapeMode = shape;
-    state.reset();
-
-    // Update UI
-    this.updateShapeUI();
+    const div = document.createElement("div");
+    div.classList.add("input-group");
+    const label = document.createElement("label");
+    label.textContent = `Радіус R (${unit}):`;
+    const input = document.createElement("input");
+    input.type = "number";
+    input.value = displayVal;
+    input.step = "0.01";
+    
+    input.addEventListener("change", (e) => {
+      const newVal = parseFloat(e.target.value) || 0;
+      state.circleRadius = newVal * multiplier;
+      state.shapeArea = window.Calculations.calculateCircleArea(state.circleRadius);
+      window.Drawing.redrawCanvas();
+      this.updateResultText();
+    });
+    
+    div.appendChild(label);
+    div.appendChild(input);
+    state.dynamicInputsContainer.appendChild(div);
   },
+
+  handleConfirmSides: function() {
+    const state = window.AppState;
+    const count = parseInt(state.sidesCountInput.value) || 4;
+    const multiplier = state.shapeUnit === "m" ? 100 : 1;
+    const radius = multiplier / (2 * Math.sin(Math.PI / count));
+
+    state.points = window.Shapes.generateRegularPolygon(count, radius);
+    state.isShapeClosed = true;
+    state.shapeArea = window.Calculations.calculatePolygonArea(state.points);
+    window.Drawing.updateTransform(true);
+    this.createSideInputs(state.points);
+    this.updateResultText();
+    window.Drawing.redrawCanvas();
+  }
 };

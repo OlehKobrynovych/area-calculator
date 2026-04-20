@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
@@ -7,96 +8,86 @@
 </head>
 <body>
   <div class="container">
-    <header class="header">
-      <h1>Калькулятор площі</h1>
-    </header>
+    <h1>Калькулятор площі</h1>
 
-    <div class="content">
-      <div class="drawing-section">
-        <p class="draw-instruction">Клацніть на полотні, щоб додати точки та намалювати фігуру.</p>
-        <div class="shape-selection">
-          <div class="shape-buttons">
-            <button class="shape-btn" data-shape="custom" title="Довільна фігура">
-              <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5Z29uIHBvaW50cz0iMTMgMiAzIDE0IDEyIDE0IDExIDIyIDIxIDEwIDEyIDEwIDEzIDIiPjwvcG9seWdvbj48L3N2Zz4=" alt="Довільна">
-            </button>
-            <button class="shape-btn" data-shape="rectangle" title="Прямокутник">
-              <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjMiIHk9IjMiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgcng9IjIiIHJ5PSIyIj48L3JlY3Q+PC9zdmc+" alt="Прямокутник">
-            </button>
-            <button class="shape-btn" data-shape="l-shape" title="Г-подібна форма">
-              <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOSAxNEg5VjloMTB2MTBIMVY1aDQiPjwvcGF0aD48L3N2Zz4=" alt="Г-подібна">
-            </button>
-            <button class="shape-btn" data-shape="triangle" title="Трикутник">
-              <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5Z29uIHBvaW50cz0iMTIgMiA0IDIxIDIwIDIxIi8+PC9zdmc+" alt="Трикутник">
-            </button>
-            <button class="shape-btn" data-shape="circle" title="Коло">
-              <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48L3N2Zz4=" alt="Коло">
-            </button>
-          </div>
-        </div>
-        <div id="shape-unit-section" class="shape-unit-section">
-          <div class="section-header">Розміри фігури</div>
-          <div class="unit-radio-group">
-            <label class="radio-label">
-              <input type="radio" name="shape-unit" value="cm" checked>
-              <span>см</span>
-            </label>
-            <label class="radio-label">
-              <input type="radio" name="shape-unit" value="m">
-              <span>м</span>
-            </label>
-          </div>
-        </div>
-        <div id="shape-inputs" class="shape-inputs">
-          <!-- Dynamic input fields for shape dimensions will go here -->
-        </div>
-        <canvas id="canvas" width="400" height="300"></canvas>
-        <div class="canvas-buttons">
-          <button id="close-shape-btn" class="btn">Замкнути фігуру</button>
-          <button id="undo-last-point-btn" class="btn">Cкасувати</button>
-          <button id="clear-btn" class="btn">Очистити</button>
-        </div>
-      </div>
-
-      <div class="result-section">
-        <h3>Результат</h3>
-        <p id="result-text">Будь ласка, намалюйте фігуру та натисніть кнопку розрахунку.</p>
-      </div>
-
-      <div class="input-section">
-        <div class="section-header">Розміри матеріалу</div>
-        <div class="unit-radio-group">
-          <label class="radio-label">
-            <input type="radio" name="material-unit" value="cm" checked>
-            <span>см</span>
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="material-unit" value="m">
-            <span>м</span>
-          </label>
-        </div>
-        <div class="input-group">
-          <label for="material-width">Ширина одиниці</label>
-          <input type="number" id="material-width" value="20">
-        </div>
-        <div class="input-group">
-          <label for="material-height">Довжина одиниці</label>
-          <input type="number" id="material-height" value="30">
-        </div>
-        <div class="input-group">
-          <label for="units-per-pack">Одиниць в упаковці</label>
-          <input type="number" id="units-per-pack" value="10">
-        </div>
-        <div class="input-group">
-          <label for="material-price">Ціна за одиницю</label>
-          <input type="number" id="material-price" value="0">
-        </div>
-        <div class="result-section">
-          <div id="material-result-display"></div>
+    <!-- Shape Selection -->
+    <div class="section">
+      <div class="shape-selection" id="shape-buttons">
+        <div class="shape-buttons" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
+          <button class="shape-btn active" data-shape="custom">Довільна</button>
+          <button class="shape-btn" data-shape="square">Квадрат</button>
+          <button class="shape-btn" data-shape="rectangle">Прямокутник</button>
+          <button class="shape-btn" data-shape="triangle">Трикутник</button>
+          <button class="shape-btn" data-shape="l-shape">Г-подібна</button>
+          <button class="shape-btn" data-shape="circle">Круг</button>
         </div>
       </div>
     </div>
+
+    <!-- Global Unit Selection -->
+    <div class="section" id="global-unit-section">
+      <div class="radio-group" style="display: flex; gap: 20px; justify-content: center; margin-bottom: 15px;">
+        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+          <input type="radio" name="shape-unit" value="cm" checked> см
+        </label>
+        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+          <input type="radio" name="shape-unit" value="m"> м
+        </label>
+      </div>
+    </div>
+
+    <!-- Drawing Area (Canvas) -->
+    <div class="section" id="drawing-section">
+      <canvas id="canvas" width="400" height="300"></canvas>
+      <div class="canvas-controls" id="canvas-buttons" style="display: flex; justify-content: center; margin-top: 10px;">
+        <button id="clear-btn" style="padding: 8px 20px; background: #ffebee; color: #d32f2f; border: 1px solid #ffcdd2; border-radius: 6px; cursor: pointer;">Очистити</button>
+      </div>
+    </div>
+
+    <!-- Shape Inputs Area -->
+    <div class="section" id="inputs-section">
+      <div id="custom-sides-config" style="display: block;">
+        <div class="input-group">
+          <label for="sides-count">Кількість сторін:</label>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="number" id="sides-count" min="3" max="20" value="4">
+            <button id="confirm-sides">OK</button>
+          </div>
+        </div>
+      </div>
+      <div id="dynamic-inputs"></div>
+    </div>
+
+    <!-- Results Display -->
+    <div class="section result-section" style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px; text-align: center;">
+      <div id="area-result" class="result-text" style="font-weight: 600; color: #1877f2;">Будь ласка, введіть параметри фігури.</div>
+    </div>
+
+    <!-- Material Calculation Section -->
+    <div class="section material-section" style="margin-top: 25px; border-top: 1px solid #eee; padding-top: 20px;">
+      <h2 style="font-size: 18px; margin-bottom: 15px;">Розрахунок матеріалу</h2>
+      <div class="input-group">
+        <label>Ширина (см):</label>
+        <input type="number" id="material-width" placeholder="30">
+      </div>
+      <div class="input-group">
+        <label>Довжина (см):</label>
+        <input type="number" id="material-height" placeholder="30">
+      </div>
+      <div class="input-group">
+        <label>В упаковці:</label>
+        <input type="number" id="units-per-pack" placeholder="10">
+      </div>
+      <div class="input-group">
+        <label>Ціна (грн):</label>
+        <input type="number" id="material-price" placeholder="500">
+      </div>
+      
+      <div id="material-result" class="material-result" style="margin-top: 15px; font-size: 14px; line-height: 1.5; color: #444;"></div>
+    </div>
   </div>
 
+  <!-- Scripts -->
   <script src="modules/state.js"></script>
   <script src="modules/calculations.js"></script>
   <script src="modules/shapes.js"></script>

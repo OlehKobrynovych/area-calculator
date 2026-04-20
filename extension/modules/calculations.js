@@ -1,309 +1,168 @@
 // Mathematical calculations module
 window.Calculations = {
-  // Calculate custom shape area using shoelace formula
-  calculateCustomShapeArea: function (points) {
-    if (!points || points.length < 3) {
-      return 0;
-    }
-
+  // Calculate polygon area using shoelace formula (Gauss)
+  // Assumes points are in logical units (cm)
+  calculatePolygonArea: function (points) {
+    if (!points || points.length < 3) return 0;
+    
     let area = 0;
     for (let i = 0; i < points.length; i++) {
       const p1 = points[i];
       const p2 = points[(i + 1) % points.length];
-      area += p1.x * p2.y - p2.x * p1.y;
+      area += (p1.x * p2.y) - (p2.x * p1.y);
     }
     return Math.abs(area) / 2;
   },
 
-  // Calculate distance between two points
-  calculateDistance: function (p1, p2) {
-    const dx = p2.x - p1.x;
-    const dy = p2.y - p1.y;
-    return Math.sqrt(dx * dx + dy * dy);
-  },
-
-  // Find intersection of two circles to determine new point position
-  // p1: center of first circle (fixed start point of changed side)
-  // p3: center of second circle (fixed end point of next side)
-  // R1: radius of first circle (new length of changed side)
-  // R2: radius of second circle (original length of next side)
-  // origP2: original position of the point we're moving (to choose closest intersection)
-  // Returns: { point: {x, y}, adjustedR2: number }
-  findCircleIntersection: function (p1, p3, R1, R2, origP2) {
-    const dx = p3.x - p1.x;
-    const dy = p3.y - p1.y;
-    const d = Math.sqrt(dx * dx + dy * dy);
-
-    // Edge case: centers are the same
-    if (d < 0.0001) {
-      return {
-        point: { x: p1.x + R1, y: p1.y },
-        adjustedR2: R2,
-      };
-    }
-
-    let adjustedR2 = R2;
-
-    // Case: circles don't intersect (too far apart)
-    if (d > R1 + R2) {
-      adjustedR2 = d - R1;
-    }
-    // Case: one circle inside the other
-    else if (d < Math.abs(R1 - R2)) {
-      if (R1 > R2) {
-        adjustedR2 = R1 - d + 0.1; // Small offset to ensure intersection
-      } else {
-        adjustedR2 = d + R1 + 0.1;
-      }
-    }
-
-    // Calculate intersection points
-    const a = (R1 * R1 - adjustedR2 * adjustedR2 + d * d) / (2 * d);
-    const hSquared = R1 * R1 - a * a;
-
-    // Numerical error - point on line between centers
-    if (hSquared < 0) {
-      const ratio = R1 / d;
-      return {
-        point: { x: p1.x + dx * ratio, y: p1.y + dy * ratio },
-        adjustedR2: adjustedR2,
-      };
-    }
-
-    const h = Math.sqrt(hSquared);
-
-    // Point P0 on line between centers
-    const P0x = p1.x + (a * dx) / d;
-    const P0y = p1.y + (a * dy) / d;
-
-    // Perpendicular vector
-    const perpX = -dy / d;
-    const perpY = dx / d;
-
-    // Two intersection points
-    const intersection1 = {
-      x: P0x + h * perpX,
-      y: P0y + h * perpY,
-    };
-    const intersection2 = {
-      x: P0x - h * perpX,
-      y: P0y - h * perpY,
-    };
-
-    // Choose the one closer to original position
-    const dist1 = Math.sqrt(
-      Math.pow(intersection1.x - origP2.x, 2) +
-        Math.pow(intersection1.y - origP2.y, 2)
-    );
-    const dist2 = Math.sqrt(
-      Math.pow(intersection2.x - origP2.x, 2) +
-        Math.pow(intersection2.y - origP2.y, 2)
-    );
-
-    return {
-      point: dist1 <= dist2 ? intersection1 : intersection2,
-      adjustedR2: adjustedR2,
-    };
-  },
-
-  // Calculate wall lengths for custom shape
-  calculateWallLengths: function (points) {
-    if (!points || points.length < 2) {
-      return [];
-    }
-
-    const lengths = [];
-    for (let i = 0; i < points.length; i++) {
-      const p1 = points[i];
-      const p2 = points[(i + 1) % points.length];
-      lengths.push(this.calculateDistance(p1, p2));
-    }
-    return lengths;
-  },
-
-  // Rectangle area
-  calculateRectangleArea: function (width, height) {
-    return width * height;
-  },
-
-  // L-shape area from 6 sides
-  // A = top, B = right-top vertical, C = inner horizontal, D = inner vertical, E = bottom, F = left vertical
-  calculateLShapeArea: function (sideA, sideB, sideC, sideD, sideE, sideF) {
-    // Validate L-shape dimensions
-    // sideC must be less than sideA (inner width < outer width)
-    // sideD must be less than sideF (inner height < outer height)
-    if (sideC >= sideA || sideD >= sideF) {
-      console.warn("Invalid L-shape: inner dimensions must be smaller than outer");
-      return 0;
-    }
-
-    if (sideA <= 0 || sideF <= 0) {
-      return 0;
-    }
-
-    // L-shape = big rectangle minus cutout rectangle
-    // Area = sideA * sideF - sideC * sideD
-    return sideA * sideF - sideC * sideD;
-  },
-
-  // Triangle area using Heron's formula (from 3 sides)
-  calculateTriangleArea: function (a, b, c) {
-    // Check if triangle is valid
-    if (a + b <= c || a + c <= b || b + c <= a) {
-      return 0;
-    }
-    // Heron's formula
-    const s = (a + b + c) / 2;
-    return Math.sqrt(s * (s - a) * (s - b) * (s - c));
-  },
-
-  // Circle area
+  // Calculate circle area
   calculateCircleArea: function (radius) {
     return Math.PI * radius * radius;
   },
 
-  // Rectangle area (simple width * height)
-  // For general quadrilaterals, use shoelace formula with 4 points instead
-  calculateRectArea: function (width, height) {
-    return width * height;
-  },
-
-  // Calculate area for predefined shapes
-  calculatePredefinedShapeArea: function (mode, dimensions) {
-    const state = window.AppState;
-    const unitMultiplier = state.shapeUnit === "m" ? 100 : 1; // Convert to cm
-    const getVal = (inputRef) =>
-      (parseFloat(inputRef.value) || 0) * unitMultiplier;
-    let areaCm2 = 0;
-
-    try {
-      switch (mode) {
-        case "rectangle":
-          // For rectangle, use width * height (sides A and B)
-          const sideA = getVal(dimensions.sideA);
-          const sideB = getVal(dimensions.sideB);
-          areaCm2 = this.calculateRectArea(sideA, sideB);
-          break;
-        case "l-shape":
-          const lSideA = getVal(dimensions.sideA);
-          const lSideB = getVal(dimensions.sideB);
-          const lSideC = getVal(dimensions.sideC);
-          const lSideD = getVal(dimensions.sideD);
-          const lSideE = getVal(dimensions.sideE);
-          const lSideF = getVal(dimensions.sideF);
-          areaCm2 = this.calculateLShapeArea(
-            lSideA,
-            lSideB,
-            lSideC,
-            lSideD,
-            lSideE,
-            lSideF
-          );
-          break;
-        case "triangle":
-          const triSideA = getVal(dimensions.sideA);
-          const triSideB = getVal(dimensions.sideB);
-          const triSideC = getVal(dimensions.sideC);
-          areaCm2 = this.calculateTriangleArea(triSideA, triSideB, triSideC);
-          break;
-        case "circle":
-          const circRadius = getVal(dimensions.radius);
-          areaCm2 = this.calculateCircleArea(circRadius);
-          break;
-        default:
-          areaCm2 = 0;
-      }
-    } catch (e) {
-      console.error("Помилка у розрахунках:", e);
-      areaCm2 = 0;
-    }
-
-    return areaCm2;
+  // Calculate distance between two points
+  calculateDistance: function (p1, p2) {
+    return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
   },
 
   // Calculate material requirements
-  calculateMaterialRequirements: function (
-    shapeArea,
-    materialWidth,
-    materialHeight,
-    unitsPerPack
-  ) {
-    if (
-      shapeArea <= 0 ||
-      materialWidth <= 0 ||
-      materialHeight <= 0 ||
-      unitsPerPack <= 0
-    ) {
-      return null;
-    }
+  // areaCm2: area in cm2
+  // materialWidth, materialHeight: in cm
+  calculateMaterialRequirements: function (areaCm2, materialWidth, materialHeight, unitsPerPack) {
+    if (areaCm2 <= 0 || materialWidth <= 0 || materialHeight <= 0) return null;
 
-    const unitArea = materialWidth * materialHeight;
-    if (unitArea <= 0) {
-      return null;
+    const materialArea = materialWidth * materialHeight;
+    // Use a small epsilon to avoid 100.000000001 becoming 101
+    const unitsNeeded = Math.ceil((areaCm2 / materialArea) - 0.00001);
+    
+    let packsNeeded = 0;
+    if (unitsPerPack > 0) {
+      packsNeeded = Math.ceil(unitsNeeded / unitsPerPack);
     }
-
-    const unitsNeeded = Math.ceil(shapeArea / unitArea);
-    const packsNeeded = Math.ceil(unitsNeeded / unitsPerPack);
 
     return {
       unitsNeeded,
-      packsNeeded,
-      areaM2: (shapeArea / 10000).toFixed(2),
+      packsNeeded
     };
   },
 
-  // A new function to calculate area from inputs without modifying the shape
-  // Input values are in visual units (same number for cm and m)
-  // unitMultiplier converts visual units to real cm for area calculation
-  calculateAreaFromInputs: function () {
-    const state = window.AppState;
-    const { currentShapeMode, shapeDimensions, customWallInputs, shapeUnit } =
-      state;
-    const unitMultiplier = shapeUnit === "m" ? 100 : 1;
-    let areaVisualUnits = 0;
+  // Check if two line segments (p1, p2) and (p3, p4) intersect
+  doSegmentsIntersect: function (p1, p2, p3, p4) {
+    function ccw(A, B, C) {
+      return (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x);
+    }
+    return (
+      ccw(p1, p3, p4) !== ccw(p2, p3, p4) && ccw(p1, p2, p3) !== ccw(p1, p2, p4)
+    );
+  },
 
-    // Get raw input value (visual units)
-    const getVal = (input) => parseFloat(input.value) || 0;
+  // Resolve self-intersections using 2-opt swap
+  resolveIntersections: function (points) {
+    let pts = [...points];
+    let improved = true;
+    let iterations = 0;
+    const maxIterations = 50;
 
-    if (currentShapeMode === "circle") {
-      const radius = getVal(shapeDimensions.radius);
-      areaVisualUnits = this.calculateCircleArea(radius);
-    } else if (customWallInputs && customWallInputs.length > 0) {
-      const sides = customWallInputs.map(getVal);
-      switch (currentShapeMode) {
-        case "rectangle":
-          if (sides.length === 4) {
-            // For rectangle, use width * height (sides 0 and 1)
-            areaVisualUnits = this.calculateRectArea(sides[0], sides[1]);
+    while (improved && iterations < maxIterations) {
+      improved = false;
+      iterations++;
+      const n = pts.length;
+
+      for (let i = 0; i < n; i++) {
+        for (let j = i + 2; j < n; j++) {
+          if (i === 0 && j === n - 1) continue;
+
+          const p1 = pts[i];
+          const p2 = pts[(i + 1) % n];
+          const p3 = pts[j];
+          const p4 = pts[(j + 1) % n];
+
+          if (this.doSegmentsIntersect(p1, p2, p3, p4)) {
+            const segmentToReverse = pts.slice(i + 1, j + 1);
+            segmentToReverse.reverse();
+            pts.splice(i + 1, j - i, ...segmentToReverse);
+            improved = true;
+            break;
           }
-          break;
-        case "l-shape":
-          if (sides.length === 6) {
-            areaVisualUnits = this.calculateLShapeArea(
-              sides[0],
-              sides[1],
-              sides[2],
-              sides[3],
-              sides[4],
-              sides[5]
-            );
-          }
-          break;
-        case "triangle":
-          if (sides.length === 3) {
-            areaVisualUnits = this.calculateTriangleArea(sides[0], sides[1], sides[2]);
-          }
-          break;
-        case "custom":
-          // For custom shapes, calculate area from current points
-          if (state.points && state.points.length >= 3) {
-            const pixelArea = this.calculateCustomShapeArea(state.points);
-            areaVisualUnits = pixelArea / (state.CM_TO_PX_SCALE * state.CM_TO_PX_SCALE);
-          }
-          break;
+        }
+        if (improved) break;
       }
     }
-    // Convert visual units² to cm²
-    return areaVisualUnits * unitMultiplier * unitMultiplier;
+    return pts;
   },
+
+  // Find intersection of two circles (used to preserve side lengths while changing angles)
+  findCircleIntersection: function (p1, p3, R1, R2, prevP2) {
+    const dx = p3.x - p1.x;
+    const dy = p3.y - p1.y;
+    const d = Math.sqrt(dx * dx + dy * dy);
+
+    if (d > R1 + R2) {
+      // Circles too far apart, place p2 on line between p1 and p3
+      const ratio = R1 / d;
+      return { point: { x: p1.x + dx * ratio, y: p1.y + dy * ratio } };
+    }
+    if (d < Math.abs(R1 - R2)) {
+      // One circle inside another, place p2 on line
+      const ratio = R1 / d;
+      return { point: { x: p1.x + dx * ratio, y: p1.y + dy * ratio } };
+    }
+
+    const a = (R1 * R1 - R2 * R2 + d * d) / (2 * d);
+    const h = Math.sqrt(Math.max(0, R1 * R1 - a * a));
+    const x2 = p1.x + (a * dx) / d;
+    const y2 = p1.y + (a * dy) / d;
+
+    const paX = x2 + (h * dy) / d;
+    const paY = y2 - (h * dx) / d;
+    const pbX = x2 - (h * dy) / d;
+    const pbY = y2 + (h * dx) / d;
+
+    const d1 = Math.sqrt(Math.pow(paX - prevP2.x, 2) + Math.pow(paY - prevP2.y, 2));
+    const d2 = Math.sqrt(Math.pow(pbX - prevP2.x, 2) + Math.pow(pbY - prevP2.y, 2));
+
+    return { point: d1 < d2 ? { x: paX, y: paY } : { x: pbX, y: pbY } };
+  },
+
+  // Solve for coordinates of a cyclic polygon (max area for given side lengths)
+  solveCyclicPolygon: function(lengths) {
+    const n = lengths.length;
+    if (n < 3) return [];
+
+    const maxL = Math.max(...lengths);
+    const sumL = lengths.reduce((a, b) => a + b, 0);
+
+    // Geometry check: no side can be longer than the sum of others
+    if (maxL >= sumL - maxL) {
+        return null; // Impossible to form a closed polygon
+    }
+
+    // Solve for circumradius R using Bisection method
+    // sum(2 * asin(Li / 2R)) = 2 * PI
+    let low = maxL / 2;
+    let high = sumL / 2;
+    let R = high;
+
+    for (let i = 0; i < 40; i++) {
+      R = (low + high) / 2;
+      let sumAngles = 0;
+      for (let l of lengths) {
+        sumAngles += 2 * Math.asin(Math.min(1, l / (2 * R)));
+      }
+      if (sumAngles > 2 * Math.PI) low = R;
+      else high = R;
+    }
+
+    // Place points on the circle
+    const points = [];
+    let currentAngle = 0;
+    for (let l of lengths) {
+      points.push({
+        x: R * Math.cos(currentAngle),
+        y: R * Math.sin(currentAngle)
+      });
+      currentAngle += 2 * Math.asin(Math.min(1, l / (2 * R)));
+    }
+
+    return points;
+  }
 };

@@ -1,68 +1,60 @@
 // Global application state
 window.AppState = {
-  // Drawing data
+  // Drawing data (All coordinates in logical CM)
   points: [],
-  originalPoints: [], // Store original points for scaling
-  originalWallLengths: [], // Store original wall lengths for angle-based editing
-  shapeArea: 0,
-  currentShapeMode: "custom",
-  shapeDimensions: {},
-  customWallInputs: [],
   isShapeClosed: false,
-  mouseX: 0,
-  mouseY: 0,
-
-  // Transform state (for coordinate system)
+  currentShapeMode: "custom", // "custom", "triangle", "circle"
+  shapeUnit: "cm", // "cm", "m"
+  
+  // Viewport/Canvas transform
   scale: 1,
   offsetX: 0,
   offsetY: 0,
+  mouseX: 0,
+  mouseY: 0,
+
+  // Results
+  shapeArea: 0, // in cm2
 
   // Constants
-  CM_TO_PX_SCALE: 1,
+  CM_TO_PX_SCALE: 1, // 1 unit = 1 pixel for simplicity in logical space
 
-  // Unit settings
-  shapeUnit: "cm", // "cm" or "m"
-  materialUnit: "cm",  // "cm" or "m"
+  // Dragging state
+  draggedPointIndex: -1,
+  isDragging: false,
 
-  // DOM References (initialized in popup-main.js)
+  // DOM References
   canvas: null,
   ctx: null,
-  materialWidthInput: null,
-  materialHeightInput: null,
-  unitsPerPackInput: null,
-  materialPriceInput: null,
-  calculateBtn: null,
-  resultText: null,
-  closeShapeBtn: null,
-  clearBtn: null,
-  undoLastPointBtn: null,
-  shapeInputs: null,
-  drawingSection: null,
+  shapeButtons: null,
   drawInstruction: null,
   canvasButtons: null,
-  shapeButtonsContainer: null,
-  shapeUnitSection: null,
-  shapeUnitRadios: null,
-  materialUnitRadios: null,
+  shapeInputs: null,
+  resultText: null,
+  materialResultDisplay: null,
+  
+  // New DOM References
+  customSidesConfig: null,
+  sidesCountInput: null,
+  confirmSidesBtn: null,
+  dynamicInputsContainer: null,
 
   // Reset state
-  reset: function() {
+  reset: function () {
     this.points = [];
-    this.originalPoints = [];
-    this.originalWallLengths = [];
-    this.shapeArea = 0;
     this.isShapeClosed = false;
-    this.shapeDimensions = {};
-    this.customWallInputs = [];
-    // Reset transform
+    this.shapeArea = 0;
     this.scale = 1;
     this.offsetX = 0;
     this.offsetY = 0;
     if (this.resultText) {
       this.resultText.textContent = "Будь ласка, виберіть фігуру або намалюйте її.";
     }
-    if (this.shapeInputs) {
-      this.shapeInputs.innerHTML = "";
+    if (this.dynamicInputsContainer) {
+      this.dynamicInputsContainer.innerHTML = "";
+    }
+    if (this.materialResultDisplay) {
+        this.materialResultDisplay.innerHTML = "";
     }
   }
 };
