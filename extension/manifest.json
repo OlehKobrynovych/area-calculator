@@ -3,7 +3,6 @@
   "name": "Area Calculator",
   "version": "1.0.0",
   "description": "Calculating the area of ​​various shapes",
-  "permissions": ["storage", "activeTab", "scripting", "windows"],
   "action": {
     "default_icon": {
       "16": "icons/icon16.png",
@@ -22,11 +21,5 @@
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": ["lib/jszip.min.js"],
-      "matches": ["<all_urls>"]
-    }
-  ]
+  }
 }
