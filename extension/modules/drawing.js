@@ -221,7 +221,8 @@ window.Drawing = {
     
     ctx.fillStyle = "#000";
     ctx.textAlign = "center";
-    const unit = state.shapeUnit === "m" ? "м" : "см";
+    const dict = window.UI.translations[state.currentLanguage];
+    const unit = state.shapeUnit === "m" ? dict.unit_m_short : dict.unit_cm_short;
     const val = (radius / (state.shapeUnit === "m" ? 100 : 1)).toFixed(2);
     ctx.fillText(`R: ${val} ${unit}`, cx, cy - rPx - 10);
   },
@@ -256,7 +257,8 @@ window.Drawing = {
           const labelX = this.tx(midX + nx * (15 / state.scale));
           const labelY = this.ty(midY + ny * (15 / state.scale));
           const sideLetter = String.fromCharCode(65 + i);
-          const unit = state.shapeUnit === "m" ? "м" : "см";
+          const dict = window.UI.translations[state.currentLanguage];
+          const unit = state.shapeUnit === "m" ? dict.unit_m_short : dict.unit_cm_short;
           const multiplier = state.shapeUnit === "m" ? 100 : 1;
           const displayVal = (len / multiplier).toFixed(2);
           ctx.fillText(`${sideLetter}: ${displayVal}${unit}`, labelX, labelY);
