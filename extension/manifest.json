@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Area Calculator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Calculating the area of ​​various shapes",
   "action": {
     "default_icon": {
