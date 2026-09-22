@@ -92,19 +92,19 @@
       <h2 style="font-size: 18px; margin-bottom: 15px;" data-i18n="material_title">Розрахунок матеріалу</h2>
       <div class="input-group">
         <label><span data-i18n="mat_width">Ширина</span> (<span data-i18n="unit_cm_short">см</span>):</label>
-        <input type="number" id="material-width" placeholder="30">
+        <input type="number" id="material-width" value="30" min="0" step="0.1">
       </div>
       <div class="input-group">
         <label><span data-i18n="mat_height">Довжина</span> (<span data-i18n="unit_cm_short">см</span>):</label>
-        <input type="number" id="material-height" placeholder="30">
+        <input type="number" id="material-height" value="30" min="0" step="0.1">
       </div>
       <div class="input-group">
         <label data-i18n="mat_per_pack">В упаковці:</label>
-        <input type="number" id="units-per-pack" placeholder="10">
+        <input type="number" id="units-per-pack" value="10" min="0" step="1">
       </div>
       <div class="input-group">
         <label><span data-i18n="mat_price">Ціна</span> (<span data-i18n="unit_currency">грн</span>):</label>
-        <input type="number" id="material-price" placeholder="500">
+        <input type="number" id="material-price" value="500" min="0" step="0.01">
       </div>
       
       <div id="material-result" class="material-result"></div>

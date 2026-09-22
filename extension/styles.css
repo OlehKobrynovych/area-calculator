@@ -410,6 +410,20 @@ h1.main-title {
   box-shadow: 0 4px 16px rgba(24, 119, 242, 0.4);
 }
 
+.side-angle-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.side-angle-row .input-group {
+  padding: 8px 10px;
+}
+
+.side-angle-row .input-group input {
+  width: 64px;
+}
+
 /* Section headers */
 .section-header {
   font-size: 14px;

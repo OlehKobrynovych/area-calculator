@@ -27,21 +27,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const updateMaterialCalculation = () => {
     const dict = window.UI.translations[state.currentLanguage];
     
-    // Clamp to 0 to prevent negative values
+    // Negative values are treated as 0 (inputs are not rewritten while typing)
     const width = Math.max(0, parseFloat(state.materialWidthInput.value) || 0);
     const height = Math.max(0, parseFloat(state.materialHeightInput.value) || 0);
     const perPack = Math.max(0, parseInt(state.unitsPerPackInput.value) || 0);
     const price = Math.max(0, parseFloat(state.materialPriceInput.value) || 0);
 
-    // Reflect clamped values in UI
-    state.materialWidthInput.value = width || "";
-    state.materialHeightInput.value = height || "";
-    state.unitsPerPackInput.value = perPack || "";
-    state.materialPriceInput.value = price || "";
-
-    if (width <= 0 || height <= 0 || state.shapeArea <= 0) {
+    if (width <= 0 || height <= 0) {
       state.materialResultDisplay.innerHTML = "";
       state.materialResultDisplay.style.display = "none";
+      return;
+    }
+    if (state.shapeArea <= 0) {
+      state.materialResultDisplay.style.display = "block";
+      state.materialResultDisplay.innerHTML = `<p>${dict.hint_no_shape}</p>`;
       return;
     }
 
@@ -90,33 +89,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // Global Unit Change
   document.querySelectorAll('input[name="shape-unit"]').forEach(radio => {
     radio.addEventListener("change", (e) => {
-      const oldUnit = state.shapeUnit;
-      const newUnit = e.target.value;
-      state.shapeUnit = newUnit;
-      
-      let factor = 1;
-      if (oldUnit === "cm" && newUnit === "m") factor = 100;
-      else if (oldUnit === "m" && newUnit === "cm") factor = 0.01;
-
-      if (state.points.length > 0) {
-        state.points.forEach(p => {
-          p.x *= factor;
-          p.y *= factor;
-        });
-      }
-      if (state.circleRadius) {
-        state.circleRadius *= factor;
-      }
-
-      window.Drawing.updateTransform(true);
+      // Geometry is always stored in cm; only the displayed unit changes
+      state.shapeUnit = e.target.value;
       window.Drawing.redrawCanvas();
-      
+
       if (state.currentShapeMode === "circle") {
-          state.shapeArea = window.Calculations.calculateCircleArea(state.circleRadius);
           window.UI.createCircleInput();
-      } else {
-          state.shapeArea = window.Calculations.calculatePolygonArea(state.points);
-          if (state.points.length > 0) window.UI.createSideInputs(state.points);
+      } else if (state.points.length > 0) {
+          window.UI.createSideInputs(state.points);
       }
 
       window.UI.updateResultText();
@@ -135,6 +115,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("clear-btn").addEventListener("click", () => {
     state.reset();
     window.Drawing.redrawCanvas();
+    window.UI.updateResultText();
+    updateMaterialCalculation();
   });
 
   // Custom Sides Confirmation
@@ -151,4 +133,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial UI Setup
   window.UI.handleShapeButtonClick("custom");
   window.UI.translateUI(); // Set initial language
+  updateMaterialCalculation();
 });

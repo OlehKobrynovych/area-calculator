@@ -107,21 +107,22 @@ window.Drawing = {
     const threshold = 12 / state.scale;
 
     if (state.isDragging) {
+      const prev = state.points[state.draggedPointIndex];
       state.points[state.draggedPointIndex] = { x: mousePos.x, y: mousePos.y };
-      
-      // Dynamic scaling during drag!
-      this.updateTransform();
-      
+
+      // Reject moves that make the polygon self-intersecting (shoelace would be wrong)
+      if (this.hasSelfIntersection(state.points)) {
+        state.points[state.draggedPointIndex] = prev;
+        return;
+      }
+
+      // Transform stays fixed during drag so the point follows the cursor;
+      // it is re-fitted on mouseup
+
       state.shapeArea = window.Calculations.calculatePolygonArea(state.points);
       window.UI.updateResultText();
       
-      const multiplier = state.shapeUnit === "m" ? 100 : 1;
-      state.points.forEach((p1, i) => {
-        const p2 = state.points[(i + 1) % state.points.length];
-        const len = window.Calculations.calculateDistance(p1, p2);
-        const input = document.getElementById(`side-input-${i}`);
-        if (input) input.value = (len / multiplier).toFixed(2);
-      });
+      window.UI.syncSideInputs();
 
       this.requestRedraw();
     } else {
@@ -147,6 +148,8 @@ window.Drawing = {
     if (state.isDragging) {
       state.isDragging = false;
       state.draggedPointIndex = -1;
+      this.updateTransform(true);
+      this.redrawCanvas();
       window.UI.createSideInputs(state.points);
       const event = new CustomEvent('shapeChanged');
       document.dispatchEvent(event);
@@ -259,6 +262,40 @@ window.Drawing = {
           ctx.fillText(`${sideLetter}: ${displayVal}${unit}`, labelX, labelY);
       }
     });
+
+    // Angle labels inside each vertex (along the bisector)
+    const angles = window.Calculations.getInteriorAngles(pts);
+    ctx.fillStyle = "#6b21a8";
+    pts.forEach((p, i) => {
+      const prev = pts[(i - 1 + pts.length) % pts.length];
+      const next = pts[(i + 1) % pts.length];
+      const d1 = window.Calculations.calculateDistance(p, prev);
+      const d2 = window.Calculations.calculateDistance(p, next);
+      if (d1 === 0 || d2 === 0) return;
+      let bx = (prev.x - p.x) / d1 + (next.x - p.x) / d2;
+      let by = (prev.y - p.y) / d1 + (next.y - p.y) / d2;
+      const bl = Math.sqrt(bx * bx + by * by);
+      if (bl < 1e-6) return;
+      const sign = angles[i] > 180 ? -1 : 1;
+      const offset = 36 / state.scale;
+      const x = this.tx(p.x + sign * bx / bl * offset);
+      const y = this.ty(p.y + sign * by / bl * offset);
+      ctx.fillText(`${String.fromCharCode(65 + i)} ${angles[i].toFixed(1)}°`, x, y + 4);
+    });
+  },
+
+  hasSelfIntersection: function(pts) {
+    const n = pts.length;
+    if (n < 4) return false;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 2; j < n; j++) {
+        if (i === 0 && j === n - 1) continue; // adjacent via wrap-around
+        if (window.Calculations.doSegmentsIntersect(pts[i], pts[(i + 1) % n], pts[j], pts[(j + 1) % n])) {
+          return true;
+        }
+      }
+    }
+    return false;
   },
 
   _raf: null,
