@@ -1,3 +1,14 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
 body {
   font-family: sans-serif;
   margin: 0;
@@ -5,7 +16,9 @@ body {
 }
 
 .container {
-  width: 440px;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
   padding: 25px;
   background-color: #ffffff;
   border-radius: 8px;
@@ -152,12 +165,6 @@ h1.main-title {
   right: 0;
   height: 4px;
   background: linear-gradient(90deg, #1877f2, #42a5f5, #1877f2);
-  animation: shimmer 3s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0%, 100% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
 }
 
 #material-result {
@@ -517,12 +524,6 @@ h1.main-title {
   right: 0;
   height: 4px;
   background: linear-gradient(90deg, #28a745, #20c997, #28a745);
-  animation: shimmer-green 3s ease-in-out infinite;
-}
-
-@keyframes shimmer-green {
-  0%, 100% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
 }
 
 .material-section h2 {
@@ -565,6 +566,9 @@ h1.main-title {
   background-color: #fafbfc;
   border: none;
   border-radius: 0;
+  width: 100%;
+  max-width: 400px;
+  height: auto;
 }
 
 /* Shape unit section */

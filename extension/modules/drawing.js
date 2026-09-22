@@ -75,8 +75,10 @@ window.Drawing = {
   getLogicalMousePos: function(e) {
     const state = window.AppState;
     const rect = state.canvas.getBoundingClientRect();
-    const screenX = e.clientX - rect.left;
-    const screenY = e.clientY - rect.top;
+    const scaleX = state.canvas.width / rect.width;
+    const scaleY = state.canvas.height / rect.height;
+    const screenX = (e.clientX - rect.left) * scaleX;
+    const screenY = (e.clientY - rect.top) * scaleY;
     return {
       x: (screenX - state.offsetX) / state.scale,
       y: (screenY - state.offsetY) / state.scale
