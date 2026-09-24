@@ -36,7 +36,9 @@ window.UI = {
       error_impossible: "Така фігура неможлива — значення не застосовано.",
       radius_label: "Радіус R",
       unit_m2: "м²",
-      unit_cm2: "см²"
+      unit_cm2: "см²",
+      btn_calculate: "Розрахувати",
+      hint_press_calculate: "Натисніть «Розрахувати», щоб побачити площу та кількість матеріалу."
     },
     en: {
       title: "Area Calculator",
@@ -73,7 +75,9 @@ window.UI = {
       error_impossible: "This shape is impossible — value not applied.",
       radius_label: "Radius R",
       unit_m2: "m²",
-      unit_cm2: "cm²"
+      unit_cm2: "cm²",
+      btn_calculate: "Calculate",
+      hint_press_calculate: "Press Calculate to see the area and materials needed."
     },
     fr: {
       title: "Calculateur de surface",
@@ -110,7 +114,9 @@ window.UI = {
       error_impossible: "Cette forme est impossible — valeur non appliquée.",
       radius_label: "Rayon R",
       unit_m2: "m²",
-      unit_cm2: "cm²"
+      unit_cm2: "cm²",
+      btn_calculate: "Calculer",
+      hint_press_calculate: "Appuyez sur Calculer pour voir la surface et le matériel nécessaire."
     },
     de: {
       title: "Flächenrechner",
@@ -147,7 +153,9 @@ window.UI = {
       error_impossible: "Diese Form ist unmöglich — Wert nicht übernommen.",
       radius_label: "Radius R",
       unit_m2: "m²",
-      unit_cm2: "cm²"
+      unit_cm2: "cm²",
+      btn_calculate: "Berechnen",
+      hint_press_calculate: "Drücken Sie Berechnen, um Fläche und Materialbedarf zu sehen."
     },
     es: {
       title: "Calculadora de área",
@@ -184,7 +192,9 @@ window.UI = {
       error_impossible: "Esta forma es imposible — valor no aplicado.",
       radius_label: "Radio R",
       unit_m2: "m²",
-      unit_cm2: "cm²"
+      unit_cm2: "cm²",
+      btn_calculate: "Calcular",
+      hint_press_calculate: "Pulse Calcular para ver el área y el material necesario."
     },
     pl: {
       title: "Kalkulator powierzchni",
@@ -221,7 +231,9 @@ window.UI = {
       error_impossible: "Taki kształt jest niemożliwy — wartość nie została zastosowana.",
       radius_label: "Promień R",
       unit_m2: "m²",
-      unit_cm2: "cm²"
+      unit_cm2: "cm²",
+      btn_calculate: "Oblicz",
+      hint_press_calculate: "Naciśnij Oblicz, aby zobaczyć powierzchnię i potrzebny materiał."
     },
     it: {
       title: "Calcolatore di superficie",
@@ -258,7 +270,9 @@ window.UI = {
       error_impossible: "Questa forma è impossibile — valore non applicato.",
       radius_label: "Raggio R",
       unit_m2: "m²",
-      unit_cm2: "cm²"
+      unit_cm2: "cm²",
+      btn_calculate: "Calcola",
+      hint_press_calculate: "Premi Calcola per vedere l'area e il materiale necessario."
     },
     pt: {
       title: "Calculadora de área",
@@ -295,7 +309,9 @@ window.UI = {
       error_impossible: "Esta forma é impossível — valor não aplicado.",
       radius_label: "Raio R",
       unit_m2: "m²",
-      unit_cm2: "cm²"
+      unit_cm2: "cm²",
+      btn_calculate: "Calcular",
+      hint_press_calculate: "Clique em Calcular para ver a área e o material necessário."
     },
     tr: {
       title: "Alan Hesaplayıcı",
@@ -332,7 +348,9 @@ window.UI = {
       error_impossible: "Bu şekil imkansız — değer uygulanmadı.",
       radius_label: "Yarıçap R",
       unit_m2: "m²",
-      unit_cm2: "cm²"
+      unit_cm2: "cm²",
+      btn_calculate: "Hesapla",
+      hint_press_calculate: "Alanı ve gereken malzemeyi görmek için Hesapla'ya basın."
     },
     nl: {
       title: "Oppervlakteberekening",
@@ -369,7 +387,9 @@ window.UI = {
       error_impossible: "Deze vorm is onmogelijk — waarde niet toegepast.",
       radius_label: "Straal R",
       unit_m2: "m²",
-      unit_cm2: "cm²"
+      unit_cm2: "cm²",
+      btn_calculate: "Berekenen",
+      hint_press_calculate: "Druk op Berekenen om de oppervlakte en het benodigde materiaal te zien."
     }
   },
 
@@ -399,12 +419,27 @@ window.UI = {
     document.dispatchEvent(event);
   },
 
+  // Inputs that define a result; the result is shown only while they match the last Calculate
+  resultSignature: function() {
+    const state = window.AppState;
+    const mat = [state.materialWidthInput, state.materialHeightInput, state.unitsPerPackInput, state.materialPriceInput]
+      .map(i => (i ? i.value : ""));
+    return [state.shapeArea.toFixed(4), ...mat].join("|");
+  },
+
+  isResultCurrent: function() {
+    const state = window.AppState;
+    return state.calculatedSignature !== null && state.calculatedSignature === this.resultSignature();
+  },
+
   // Update result text display
   updateResultText: function() {
     const state = window.AppState;
     const dict = this.translations[state.currentLanguage];
     
-    if (state.shapeArea > 0) {
+    if (state.shapeArea > 0 && !this.isResultCurrent()) {
+      state.resultText.textContent = dict.hint_press_calculate;
+    } else if (state.shapeArea > 0) {
       const unitLabel = state.shapeUnit === "m" ? dict.unit_m2 : dict.unit_cm2;
       const area = state.shapeUnit === "m" ? state.shapeArea / 10000 : state.shapeArea;
       const extra = state.shapeUnit === "m" ? "" : ` (${(state.shapeArea / 10000).toFixed(2)} ${dict.unit_m2})`;

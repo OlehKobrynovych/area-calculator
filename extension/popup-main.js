@@ -44,6 +44,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // Results appear only after Calculate, and disappear once inputs change
+    if (!window.UI.isResultCurrent()) {
+      state.materialResultDisplay.innerHTML = "";
+      state.materialResultDisplay.style.display = "none";
+      return;
+    }
+
     const result = window.Calculations.calculateMaterialRequirements(
       state.shapeArea, width, height, perPack
     );
@@ -129,6 +136,42 @@ document.addEventListener("DOMContentLoaded", () => {
   [state.materialWidthInput, state.materialHeightInput, state.unitsPerPackInput, state.materialPriceInput].forEach(input => {
     input.addEventListener("input", updateMaterialCalculation);
   });
+
+  // Calculate: the only action that counts toward the free monthly limit
+  let calculating = false;
+  document.getElementById("calculate-btn").addEventListener("click", async () => {
+    if (calculating) return;
+    const dict = window.UI.translations[state.currentLanguage];
+    if (!(state.shapeArea > 0)) {
+      state.resultText.textContent = dict.hint_invalid;
+      return; // nothing calculated -> nothing consumed
+    }
+    if (window.UI.isResultCurrent()) return; // same inputs already shown
+
+    calculating = true;
+    try {
+      const signature = window.UI.resultSignature();
+      const res = await window.Usage.tryConsume();
+      if (!res.allowed) {
+        window.MonetizationUI.showLimitModal();
+        return;
+      }
+      state.calculatedSignature = signature;
+      window.UI.updateResultText();
+      updateMaterialCalculation();
+    } finally {
+      calculating = false;
+      window.MonetizationUI.render();
+    }
+  });
+
+  // Monetization: restore license state, re-check with Gumroad when due (cached for 24h)
+  window.MonetizationUI.init();
+  window.Licensing.load()
+    .then(() => window.MonetizationUI.render())
+    .then(() => window.Licensing.refresh(false))
+    .then(() => window.MonetizationUI.render())
+    .catch(() => window.MonetizationUI.render());
 
   // Initial UI Setup
   window.UI.handleShapeButtonClick("custom");

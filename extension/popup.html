@@ -23,6 +23,7 @@
         <option value="nl">NL</option>
       </select>
     </div>
+    <button type="button" id="plan-badge" class="plan-badge" title="Pro License">Free</button>
 
     <!-- Shape Selection -->
     <div class="section">
@@ -90,6 +91,15 @@
       <div id="dynamic-inputs"></div>
     </div>
 
+    <!-- Calculate (the only action that counts as a calculation) -->
+    <div class="section calc-section">
+      <button type="button" id="calculate-btn" class="calculate-btn" data-i18n="btn_calculate">Calculate</button>
+      <div id="upgrade-hint" class="upgrade-hint" style="display: none;">
+        <span id="upgrade-hint-text"></span>
+        <button type="button" id="upgrade-hint-btn" class="mz-btn link">Unlock Pro</button>
+      </div>
+    </div>
+
     <!-- Results Display -->
     <div class="section result-section" style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px; text-align: center;">
       <div id="area-result" class="result-text" style="font-weight: 600; color: #1877f2;" data-i18n="hint_init">Будь ласка, введіть параметри фігури.</div>
@@ -117,6 +127,25 @@
       
       <div id="material-result" class="material-result"></div>
     </div>
+
+    <!-- Pro License -->
+    <div class="section license-section" id="license-section">
+      <h2>Pro License</h2>
+      <p class="license-pitch">Area Calculator Pro · $5.99 — Lifetime. Unlimited calculations. One-time payment. No subscription.</p>
+      <div id="license-body"></div>
+    </div>
+  </div>
+
+  <!-- Limit reached -->
+  <div id="limit-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <h3>You've used all 50 free calculations this month.</h3>
+      <p>Upgrade to Area Calculator Pro for unlimited calculations.</p>
+      <p class="modal-sub">One-time payment. No subscription. Free calculations reset on the 1st of next month.</p>
+      <button type="button" id="modal-buy-btn" class="mz-btn primary">Unlock Pro</button>
+      <button type="button" id="modal-license-btn" class="mz-btn secondary">Enter License Key</button>
+      <button type="button" id="modal-close-btn" class="mz-btn link">Not now</button>
+    </div>
   </div>
 
   <!-- Scripts -->
@@ -125,6 +154,9 @@
   <script src="modules/shapes.js"></script>
   <script src="modules/drawing.js"></script>
   <script src="modules/ui.js"></script>
+  <script src="modules/licensing.js"></script>
+  <script src="modules/usage.js"></script>
+  <script src="modules/monetization-ui.js"></script>
   <script src="popup-main.js"></script>
 </body>
 </html>

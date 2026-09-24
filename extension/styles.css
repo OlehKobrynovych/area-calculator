@@ -577,3 +577,157 @@ h1.main-title {
   background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
   border-bottom: 1px solid #e1e5e9;
 }
+
+/* --- Free / Pro --- */
+.plan-badge {
+  display: inline-block;
+  margin: -6px 0 12px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4b5563;
+  background: #f0f2f5;
+  border: 1px solid #e4e6eb;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.plan-badge.pro {
+  color: #1b5e20;
+  background: #e8f5e9;
+  border-color: #c8e6c9;
+}
+
+.calc-section {
+  margin-top: 15px;
+  text-align: center;
+}
+.calculate-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #1877f2;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.calculate-btn:hover {
+  background-color: #166fe5;
+}
+.upgrade-hint {
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #606770;
+}
+
+.mz-btn {
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.mz-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.mz-btn.primary {
+  color: #fff;
+  background: #1877f2;
+  border: 1px solid #1877f2;
+}
+.mz-btn.secondary {
+  color: #1877f2;
+  background: #fff;
+  border: 1px solid #1877f2;
+}
+.mz-btn.link {
+  padding: 0;
+  font-size: inherit;
+  color: #1877f2;
+  background: none;
+  border: none;
+  text-decoration: underline;
+}
+
+.license-section {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+.license-section h2 {
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+.license-pitch,
+.license-buy,
+.license-info {
+  font-size: 13px;
+  color: #606770;
+  margin: 6px 0 10px;
+}
+#license-body input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  margin-bottom: 8px;
+  font-family: monospace;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+}
+#license-body > .mz-btn {
+  margin: 0 8px 8px 0;
+}
+.license-actions {
+  display: flex;
+  gap: 8px;
+}
+.license-status {
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+.license-status.ok { color: #2e7d32; }
+.license-status.bad { color: #d32f2f; }
+.license-message {
+  font-size: 13px;
+  margin-top: 8px;
+}
+.license-message.success { color: #2e7d32; }
+.license-message.error { color: #d32f2f; }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.45);
+}
+.modal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 360px;
+  padding: 20px;
+  text-align: center;
+  background: #fff;
+  border-radius: 10px;
+}
+.modal-card h3 {
+  margin: 0;
+  font-size: 17px;
+}
+.modal-card p {
+  margin: 0;
+  color: #444;
+}
+.modal-card .modal-sub {
+  font-size: 12px;
+  color: #606770;
+}

@@ -80,6 +80,12 @@ After modifying code:
 - Closure: with fixed directions, `Calculations.solveClosure` recomputes two other sides (2×2 linear solve, positive lengths, smallest change, no self-intersection); impossible edits are rejected
 - The cm/m switch only changes display, not geometry
 
+### Free / Pro (Gumroad)
+
+- Results (area + materials) are shown only after **Calculate**; `UI.resultSignature()` ties the shown result to its inputs, so any edit hides it again. Only Calculate calls `Usage.tryConsume()` (50/month, `chrome.storage.local.usage`, reset by YYYY-MM compare)
+- `Licensing.isProUser()` is the single Pro check: validated key + `lastValidatedAt` within 7-day grace. Re-check every 24h via public `POST api.gumroad.com/v2/licenses/verify` (no token, no backend)
+- Config: `PRODUCT_ID` / `CHECKOUT_URL` at the top of `modules/licensing.js`. Tests: `npm test`
+
 ### Coordinate System
 
 The extension currently uses a simplified 1:1 pixel-to-centimeter mapping (popup-main.js:82-84, 104-105). This is a placeholder implementation. In a real-world scenario, you would need to establish a proper scale or allow users to define it.

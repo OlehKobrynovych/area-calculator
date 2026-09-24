@@ -15,6 +15,7 @@ window.AppState = {
 
   // Results
   shapeArea: 0, // in cm2
+  calculatedSignature: null, // UI.resultSignature() at the last successful Calculate
 
   // Constants
   CM_TO_PX_SCALE: 1, // 1 unit = 1 pixel for simplicity in logical space
@@ -44,6 +45,7 @@ window.AppState = {
     this.points = [];
     this.isShapeClosed = false;
     this.shapeArea = 0;
+    this.calculatedSignature = null;
     this.scale = 1;
     this.offsetX = 0;
     this.offsetY = 0;

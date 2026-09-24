@@ -1,0 +1,8 @@
+{
+  "name": "area-calculator",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/monetization.test.js",
+    "check": "node --check extension/popup-main.js && node --check extension/modules/ui.js && node --check extension/modules/state.js && node --check extension/modules/licensing.js && node --check extension/modules/usage.js && node --check extension/modules/monetization-ui.js"
+  }
+}
