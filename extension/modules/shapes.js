@@ -47,45 +47,47 @@ window.Shapes = {
     return pts.map(p => ({ x: p.x - offsetX, y: p.y - offsetY }));
   },
 
-  // Side i changed: all sides stay, only angles change to close the shape.
-  // Free angles are taken from the end of side i (vertex i+1) forward, wrapping around.
-  handleSideLengthChange: function (index, newLength) {
+  // Apply user-entered values: sides {index: cm}, angles {index: degrees}.
+  // All sides and entered angles are kept; other angles change to close the shape,
+  // nearest vertices after `start` first, wrapping around.
+  // Returns false if impossible (shape stays unchanged).
+  applyEdits: function (sides, angles, start) {
     const state = window.AppState;
     const n = state.points ? state.points.length : 0;
-    if (n < 3 || !(newLength > 0)) return false;
+    if (n < 3) return false;
 
     const C = window.Calculations;
     const lengths = C.getSideLengths(state.points);
-    lengths[index] = newLength;
-    return this.closeByAngles(lengths, C.getInteriorAngles(state.points), (index + 1) % n, n);
-  },
+    const targetAngles = C.getInteriorAngles(state.points);
+    for (const i in sides) {
+      if (!(sides[i] > 0)) return false;
+      lengths[i] = sides[i];
+    }
+    for (const i in angles) {
+      if (!(angles[i] > 0 && angles[i] < 360)) return false;
+      targetAngles[i] = angles[i];
+    }
 
-  // Angle at vertex i changed, all sides stay the same.
-  // Free angles are the following vertices (i+1, i+2, ...), wrapping around; angle i is kept.
-  handleAngleChange: function (index, newAngle) {
-    const state = window.AppState;
-    const n = state.points ? state.points.length : 0;
-    if (n < 4 || !(newAngle > 0 && newAngle < 360)) return false;
-
-    const C = window.Calculations;
-    const angles = C.getInteriorAngles(state.points);
-    angles[index] = newAngle;
-    return this.closeByAngles(C.getSideLengths(state.points), angles, (index + 1) % n, n - 1);
+    const order = [];
+    for (let k = 0; k < n; k++) {
+      const v = (start + k) % n;
+      if (!(v in angles)) order.push(v);
+    }
+    return this.closeByAngles(lengths, targetAngles, order);
   },
 
   // With fixed sides exactly 3 angles must change to close the polygon.
-  // Tries free vertices among the `count` vertices starting at `start`, nearest first;
-  // all other angles are kept. Returns false if impossible (shape stays unchanged).
-  closeByAngles: function (lengths, angles, start, count) {
+  // Tries free vertices from `order` (earlier = preferred); all other angles are kept.
+  closeByAngles: function (lengths, angles, order) {
     const state = window.AppState;
     const C = window.Calculations;
-    const n = lengths.length;
     const orientation = C.signedDoubleArea(state.points) >= 0 ? 1 : -1;
 
-    for (let c = 2; c < count; c++)
+    for (let c = 2; c < order.length; c++)
       for (let b = 1; b < c; b++)
         for (let a = 0; a < b; a++) {
-          const j1 = (start + a) % n, j2 = (start + b) % n, j3 = (start + c) % n;
+          // `order` is already cyclic, as solveWithFreeJoints needs
+          const j1 = order[a], j2 = order[b], j3 = order[c];
           const pts = this.solveWithFreeJoints(lengths, angles, orientation, j1, j2, j3);
           if (!pts || window.Drawing.hasSelfIntersection(pts)) continue;
           const got = C.getInteriorAngles(pts);
@@ -97,6 +99,70 @@ window.Shapes = {
           return true;
         }
     return false;
+  },
+
+  // Min area among convex shapes with given sides and every angle in [minAngle, 180°].
+  // At the minimum all angles but 3 sit on a bound (convexity allows at most 2 at minAngle);
+  // the 3 free ones form a rigid triangle of chords. Returns {area, angles (deg)} or null.
+  getMinAreaShape: function (lengths, minAngle) {
+    // Depends only on sides: cache so angle edits don't recompute
+    const key = lengths.map(l => l.toFixed(4)).join(",") + "|" + minAngle;
+    if (this._minAreaCache && this._minAreaCache.key === key) return this._minAreaCache.result;
+
+    const C = window.Calculations;
+    const n = lengths.length;
+    const tol = 1e-6;
+    let best = null;
+
+    for (let j1 = 0; j1 < n; j1++)
+      for (let j2 = j1 + 1; j2 < n; j2++)
+        for (let j3 = j2 + 1; j3 < n; j3++) {
+          const fixed = [];
+          for (let k = 0; k < n; k++) if (k !== j1 && k !== j2 && k !== j3) fixed.push(k);
+          // Vertices at minAngle: none, one or two of the fixed ones; the rest are 180°
+          const sharp = [[]];
+          fixed.forEach((a, x) => {
+            sharp.push([a]);
+            fixed.slice(x + 1).forEach(b => sharp.push([a, b]));
+          });
+
+          for (const s of sharp) {
+            const angles = new Array(n).fill(180);
+            s.forEach(k => { angles[k] = minAngle; });
+            const c12 = this.buildChain(lengths, angles, 1, j1, j2);
+            const c23 = this.buildChain(lengths, angles, 1, j2, j3);
+            const c31 = this.buildChain(lengths, angles, 1, j3, j1);
+            const end = c => Math.hypot(c[c.length - 1].x, c[c.length - 1].y);
+            const d12 = end(c12), d23 = end(c23), d31 = end(c31);
+            if (d12 > d23 + d31 || d23 > d12 + d31 || d31 > d12 + d23) continue;
+            // Chord triangle is part of a convex shape, so its area is a lower bound
+            const hs = (d12 + d23 + d31) / 2;
+            const triArea = Math.sqrt(Math.max(0, hs * (hs - d12) * (hs - d23) * (hs - d31)));
+            if (best && triArea >= best.area) continue;
+
+            const x = (d12 * d12 + d31 * d31 - d23 * d23) / (2 * d12);
+            const y = Math.sqrt(Math.max(0, d31 * d31 - x * x));
+            for (const sy of [1, -1]) {
+              const p1 = { x: 0, y: 0 }, p2 = { x: d12, y: 0 }, p3 = { x, y: sy * y };
+              const pts = new Array(n);
+              const put = (chain, start) => chain.forEach((p, k) => { pts[(start + k) % n] = p; });
+              put(this.placeChain(c12, p1, p2), j1);
+              put(this.placeChain(c23, p2, p3), j2);
+              put(this.placeChain(c31, p3, p1), j3);
+
+              const got = C.getInteriorAngles(pts);
+              const sum = got.reduce((t, a) => t + a, 0);
+              if (Math.abs(sum - (n - 2) * 180) > 0.01) continue;
+              if (got.some(a => a < minAngle - tol || a > 180 + tol)) continue;
+              if (fixed.some(k => Math.abs(got[k] - angles[k]) > 0.01)) continue;
+
+              const area = C.calculatePolygonArea(pts);
+              if (!best || area < best.area) best = { area, angles: got };
+            }
+          }
+        }
+    this._minAreaCache = { key, result: best };
+    return best;
   },
 
   // Local coordinates of the chain from vertex `from` to vertex `to` (walking forward),

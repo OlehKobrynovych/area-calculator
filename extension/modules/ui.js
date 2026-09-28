@@ -20,6 +20,9 @@ window.UI = {
       hint_sides: "Будь ласка, введіть кількість сторін.",
       hint_invalid: "Будь ласка, введіть дійсні розміри.",
       area_label: "Площа фігури",
+      area_max: "Максимальна площа",
+      area_min: "Мінімальна площа (опукла)",
+      angles_label: "кути",
       ready_label: "Готово до розрахунку.",
       material_title: "Розрахунок матеріалу",
       mat_width: "Ширина",
@@ -33,7 +36,7 @@ window.UI = {
       side_label: "Сторона",
       angle_label: "Кут",
       hint_no_shape: "Спочатку задайте фігуру — площа поки 0.",
-      error_impossible: "Така фігура неможлива — значення не застосовано.",
+      error_impossible: "Фігура поки не замикається — змініть інші сторони або кути.",
       radius_label: "Радіус R",
       unit_m2: "м²",
       unit_cm2: "см²"
@@ -57,6 +60,9 @@ window.UI = {
       hint_sides: "Please enter number of sides.",
       hint_invalid: "Please enter valid dimensions.",
       area_label: "Shape Area",
+      area_max: "Maximum area",
+      area_min: "Minimum area (convex)",
+      angles_label: "angles",
       ready_label: "Ready for calculation.",
       material_title: "Material Calculation",
       mat_width: "Width",
@@ -70,7 +76,7 @@ window.UI = {
       side_label: "Side",
       angle_label: "Angle",
       hint_no_shape: "Define a shape first — area is 0.",
-      error_impossible: "This shape is impossible — value not applied.",
+      error_impossible: "The shape doesn't close yet — adjust other sides or angles.",
       radius_label: "Radius R",
       unit_m2: "m²",
       unit_cm2: "cm²"
@@ -94,6 +100,9 @@ window.UI = {
       hint_sides: "Veuillez saisir le nombre de côtés.",
       hint_invalid: "Veuillez saisir des dimensions valides.",
       area_label: "Surface de la forme",
+      area_max: "Surface maximale",
+      area_min: "Surface minimale (convexe)",
+      angles_label: "angles",
       ready_label: "Prêt pour le calcul.",
       material_title: "Calcul du matériau",
       mat_width: "Largeur",
@@ -107,7 +116,7 @@ window.UI = {
       side_label: "Côté",
       angle_label: "Angle",
       hint_no_shape: "Définissez d'abord une forme — la surface est de 0.",
-      error_impossible: "Cette forme est impossible — valeur non appliquée.",
+      error_impossible: "La forme ne se ferme pas encore — ajustez les autres côtés ou angles.",
       radius_label: "Rayon R",
       unit_m2: "m²",
       unit_cm2: "cm²"
@@ -131,6 +140,9 @@ window.UI = {
       hint_sides: "Bitte geben Sie die Anzahl der Seiten ein.",
       hint_invalid: "Bitte geben Sie gültige Maße ein.",
       area_label: "Formfläche",
+      area_max: "Maximale Fläche",
+      area_min: "Minimale Fläche (konvex)",
+      angles_label: "Winkel",
       ready_label: "Bereit zur Berechnung.",
       material_title: "Materialberechnung",
       mat_width: "Breite",
@@ -144,7 +156,7 @@ window.UI = {
       side_label: "Seite",
       angle_label: "Winkel",
       hint_no_shape: "Definieren Sie zuerst eine Form — die Fläche beträgt 0.",
-      error_impossible: "Diese Form ist unmöglich — Wert nicht übernommen.",
+      error_impossible: "Die Form schließt sich noch nicht — passen Sie andere Seiten oder Winkel an.",
       radius_label: "Radius R",
       unit_m2: "m²",
       unit_cm2: "cm²"
@@ -168,6 +180,9 @@ window.UI = {
       hint_sides: "Introduzca el número de lados.",
       hint_invalid: "Introduzca dimensiones válidas.",
       area_label: "Área de la forma",
+      area_max: "Área máxima",
+      area_min: "Área mínima (convexa)",
+      angles_label: "ángulos",
       ready_label: "Listo para calcular.",
       material_title: "Cálculo de material",
       mat_width: "Ancho",
@@ -181,7 +196,7 @@ window.UI = {
       side_label: "Lado",
       angle_label: "Ángulo",
       hint_no_shape: "Defina primero una forma — el área es 0.",
-      error_impossible: "Esta forma es imposible — valor no aplicado.",
+      error_impossible: "La forma aún no se cierra — ajuste otros lados o ángulos.",
       radius_label: "Radio R",
       unit_m2: "m²",
       unit_cm2: "cm²"
@@ -205,6 +220,9 @@ window.UI = {
       hint_sides: "Podaj liczbę boków.",
       hint_invalid: "Podaj prawidłowe wymiary.",
       area_label: "Powierzchnia kształtu",
+      area_max: "Maksymalna powierzchnia",
+      area_min: "Minimalna powierzchnia (wypukła)",
+      angles_label: "kąty",
       ready_label: "Gotowe do obliczeń.",
       material_title: "Obliczenie materiału",
       mat_width: "Szerokość",
@@ -218,7 +236,7 @@ window.UI = {
       side_label: "Bok",
       angle_label: "Kąt",
       hint_no_shape: "Najpierw zdefiniuj kształt — powierzchnia wynosi 0.",
-      error_impossible: "Taki kształt jest niemożliwy — wartość nie została zastosowana.",
+      error_impossible: "Kształt jeszcze się nie zamyka — zmień inne boki lub kąty.",
       radius_label: "Promień R",
       unit_m2: "m²",
       unit_cm2: "cm²"
@@ -242,6 +260,9 @@ window.UI = {
       hint_sides: "Inserisci il numero di lati.",
       hint_invalid: "Inserisci dimensioni valide.",
       area_label: "Area della forma",
+      area_max: "Area massima",
+      area_min: "Area minima (convessa)",
+      angles_label: "angoli",
       ready_label: "Pronto per il calcolo.",
       material_title: "Calcolo del materiale",
       mat_width: "Larghezza",
@@ -255,7 +276,7 @@ window.UI = {
       side_label: "Lato",
       angle_label: "Angolo",
       hint_no_shape: "Definisci prima una forma — l'area è 0.",
-      error_impossible: "Questa forma è impossibile — valore non applicato.",
+      error_impossible: "La forma non si chiude ancora — modifica altri lati o angoli.",
       radius_label: "Raggio R",
       unit_m2: "m²",
       unit_cm2: "cm²"
@@ -279,6 +300,9 @@ window.UI = {
       hint_sides: "Insira o número de lados.",
       hint_invalid: "Insira dimensões válidas.",
       area_label: "Área da forma",
+      area_max: "Área máxima",
+      area_min: "Área mínima (convexa)",
+      angles_label: "ângulos",
       ready_label: "Pronto para calcular.",
       material_title: "Cálculo de material",
       mat_width: "Largura",
@@ -292,7 +316,7 @@ window.UI = {
       side_label: "Lado",
       angle_label: "Ângulo",
       hint_no_shape: "Defina uma forma primeiro — a área é 0.",
-      error_impossible: "Esta forma é impossível — valor não aplicado.",
+      error_impossible: "A forma ainda não fecha — ajuste outros lados ou ângulos.",
       radius_label: "Raio R",
       unit_m2: "m²",
       unit_cm2: "cm²"
@@ -316,6 +340,9 @@ window.UI = {
       hint_sides: "Lütfen kenar sayısını girin.",
       hint_invalid: "Lütfen geçerli boyutlar girin.",
       area_label: "Şekil Alanı",
+      area_max: "Maksimum alan",
+      area_min: "Minimum alan (dışbükey)",
+      angles_label: "açılar",
       ready_label: "Hesaplamaya hazır.",
       material_title: "Malzeme Hesabı",
       mat_width: "Genişlik",
@@ -329,7 +356,7 @@ window.UI = {
       side_label: "Kenar",
       angle_label: "Açı",
       hint_no_shape: "Önce bir şekil tanımlayın — alan 0.",
-      error_impossible: "Bu şekil imkansız — değer uygulanmadı.",
+      error_impossible: "Şekil henüz kapanmıyor — diğer kenarları veya açıları değiştirin.",
       radius_label: "Yarıçap R",
       unit_m2: "m²",
       unit_cm2: "cm²"
@@ -353,6 +380,9 @@ window.UI = {
       hint_sides: "Voer het aantal zijden in.",
       hint_invalid: "Voer geldige afmetingen in.",
       area_label: "Oppervlakte van de vorm",
+      area_max: "Maximale oppervlakte",
+      area_min: "Minimale oppervlakte (convex)",
+      angles_label: "hoeken",
       ready_label: "Klaar voor berekening.",
       material_title: "Materiaalberekening",
       mat_width: "Breedte",
@@ -366,7 +396,7 @@ window.UI = {
       side_label: "Zijde",
       angle_label: "Hoek",
       hint_no_shape: "Definieer eerst een vorm — oppervlakte is 0.",
-      error_impossible: "Deze vorm is onmogelijk — waarde niet toegepast.",
+      error_impossible: "De vorm sluit nog niet — pas andere zijden of hoeken aan.",
       radius_label: "Straal R",
       unit_m2: "m²",
       unit_cm2: "cm²"
@@ -412,21 +442,68 @@ window.UI = {
     } else {
       state.resultText.textContent = dict.hint_init;
     }
+    this.updateAreaExtremes();
   },
 
+  // Max / min possible area for the current sides (entered but not yet applied sides included)
+  updateAreaExtremes: function() {
+    const state = window.AppState;
+    const box = document.getElementById("area-extremes");
+    if (!box) return;
+    box.innerHTML = "";
+    // Triangle area is fixed by its sides
+    if (state.currentShapeMode === "circle" || !state.points || state.points.length < 4) return;
+
+    const dict = this.translations[state.currentLanguage];
+    const lengths = window.Calculations.getSideLengths(state.points);
+    for (const i in this.pendingEdits.sides) lengths[i] = this.pendingEdits.sides[i];
+
+    const isM = state.shapeUnit === "m";
+    const fmtArea = a => isM
+      ? `${(a / 10000).toFixed(2)} ${dict.unit_m2}`
+      : `${a.toFixed(2)} ${dict.unit_cm2} (${(a / 10000).toFixed(2)} ${dict.unit_m2})`;
+    const fmtAngles = angles => angles
+      .map((a, i) => `${String.fromCharCode(65 + i)} ${a.toFixed(1)}°`).join(", ");
+    const row = (label, shape) => {
+      const p = document.createElement("p");
+      const title = document.createElement("div");
+      title.textContent = `${label}: ${fmtArea(shape.area)}`;
+      const angles = document.createElement("div");
+      angles.className = "angles";
+      angles.textContent = `${dict.angles_label}: ${fmtAngles(shape.angles)}`;
+      p.append(title, angles);
+      box.appendChild(p);
+    };
+
+    const max = window.Calculations.getMaxAreaShape(lengths);
+    const min = window.Shapes.getMinAreaShape(lengths, 0.1); // 0.1° = angle input step
+    if (max) row(dict.area_max, max);
+    if (min) row(dict.area_min, min);
+  },
+
+  // Values entered by the user that the shape can't satisfy yet: {sides: {i: cm}, angles: {i: deg}}
+  pendingEdits: { sides: {}, angles: {} },
+
   // Update existing input values without recreating DOM (prevents focus loss)
-  // Write current sides and angles into inputs (except `skipInput`, the one being typed in)
+  // Write current sides and angles into inputs (except `skipInput` and pending ones)
   syncSideInputs: function(skipInput) {
     const state = window.AppState;
     const multiplier = state.shapeUnit === "m" ? 100 : 1;
     const lengths = window.Calculations.getSideLengths(state.points);
     const angles = window.Calculations.getInteriorAngles(state.points);
+    const pending = this.pendingEdits;
 
     lengths.forEach((len, i) => {
       const sideInput = document.getElementById(`side-input-${i}`);
-      if (sideInput && sideInput !== skipInput) sideInput.value = (len / multiplier).toFixed(2);
+      if (sideInput) {
+        sideInput.classList.toggle("input-pending", i in pending.sides);
+        if (sideInput !== skipInput && !(i in pending.sides)) sideInput.value = (len / multiplier).toFixed(2);
+      }
       const angleInput = document.getElementById(`angle-input-${i}`);
-      if (angleInput && angleInput !== skipInput) angleInput.value = angles[i].toFixed(1);
+      if (angleInput) {
+        angleInput.classList.toggle("input-pending", i in pending.angles);
+        if (angleInput !== skipInput && !(i in pending.angles)) angleInput.value = angles[i].toFixed(1);
+      }
     });
   },
 
@@ -436,10 +513,12 @@ window.UI = {
     const dict = this.translations[state.currentLanguage];
 
     state.dynamicInputsContainer.innerHTML = "";
+    this.pendingEdits = { sides: {}, angles: {} };
     const unit = state.shapeUnit === "m" ? dict.unit_m_short : dict.unit_cm_short;
     const multiplier = state.shapeUnit === "m" ? 100 : 1;
 
-    const addInput = (row, id, labelText, step, onChange) => {
+    // kind: "sides" | "angles"; value is stored as pending until the shape can close
+    const addInput = (row, id, labelText, step, kind, index, toModel) => {
       const div = document.createElement("div");
       div.classList.add("input-group");
       const label = document.createElement("label");
@@ -457,10 +536,22 @@ window.UI = {
       input.addEventListener("input", (e) => {
         if (!base) base = state.points.map(p => ({ ...p }));
         state.points = base.map(p => ({ ...p }));
-        const ok = onChange(parseFloat(e.target.value));
-        if (!ok) {
-          window.Shapes.finalizeUpdate(); // show the unchanged shape
+        const pending = this.pendingEdits;
+        const v = parseFloat(e.target.value);
+        if (isNaN(v)) delete pending[kind][index];
+        else pending[kind][index] = toModel(v);
+
+        const hasPending = Object.keys(pending.sides).length + Object.keys(pending.angles).length > 0;
+        if (!hasPending) {
+          window.Shapes.finalizeUpdate();
+        } else if (window.Shapes.applyEdits(pending.sides, pending.angles, (index + 1) % state.points.length)) {
+          this.pendingEdits = { sides: {}, angles: {} };
+        } else {
+          // Shape can't close yet: keep entered values, hide area until it can
+          window.Shapes.finalizeUpdate(); // show the last valid shape
+          state.shapeArea = 0;
           state.resultText.textContent = dict.error_impossible;
+          document.dispatchEvent(new CustomEvent('shapeChanged'));
         }
         this.syncSideInputs(input);
       });
@@ -478,9 +569,9 @@ window.UI = {
       const row = document.createElement("div");
       row.classList.add("side-angle-row");
       addInput(row, `side-input-${i}`, `${dict.side_label} ${letter} (${unit}):`, "0.01",
-        v => window.Shapes.handleSideLengthChange(i, v * multiplier));
+        "sides", i, v => v * multiplier);
       addInput(row, `angle-input-${i}`, `${dict.angle_label} ${letter} (°):`, "0.1",
-        v => window.Shapes.handleAngleChange(i, v));
+        "angles", i, v => v);
       state.dynamicInputsContainer.appendChild(row);
       // Triangle with fixed sides has fixed angles
       if (points.length === 3) document.getElementById(`angle-input-${i}`).readOnly = true;

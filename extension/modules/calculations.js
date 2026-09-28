@@ -83,5 +83,40 @@ window.Calculations = {
       while (turn <= -Math.PI) turn += 2 * Math.PI;
       return (Math.PI - s * turn) * 180 / Math.PI;
     });
+  },
+
+  // Max area for given sides: the polygon inscribed in a circle.
+  // Returns {area, angles (deg)} or null if the sides can't form a polygon.
+  getMaxAreaShape: function (lengths) {
+    const n = lengths.length;
+    const total = lengths.reduce((s, l) => s + l, 0);
+    const maxIdx = lengths.indexOf(Math.max(...lengths));
+    const M = lengths[maxIdx];
+    if (n < 3 || M >= total - M - 1e-9) return null;
+
+    const theta = (R, l) => 2 * Math.asin(Math.min(1, l / (2 * R)));
+    const sumTheta = R => lengths.reduce((s, l) => s + theta(R, l), 0);
+    // Center inside the polygon if the arcs at the smallest radius already cover the circle
+    const inside = sumTheta(M / 2) >= 2 * Math.PI;
+    const h = inside
+      ? R => sumTheta(R) - 2 * Math.PI
+      : R => sumTheta(R) - 2 * theta(R, M);
+
+    let lo = M / 2, hi = M;
+    const sLo = Math.sign(h(lo));
+    while (Math.sign(h(hi)) === sLo && hi < 1e12) hi *= 2;
+    for (let k = 0; k < 200; k++) {
+      const mid = (lo + hi) / 2;
+      if (Math.sign(h(mid)) === sLo) lo = mid; else hi = mid;
+    }
+    const R = (lo + hi) / 2;
+
+    // Longest side's triangle is subtracted when the center is outside
+    const sign = lengths.map((l, i) => (!inside && i === maxIdx ? -1 : 1));
+    const th = lengths.map(l => theta(R, l));
+    const area = th.reduce((s, t, i) => s + sign[i] * R * R * Math.sin(t) / 2, 0);
+    const half = th.map((t, i) => sign[i] * (Math.PI - t) / 2);
+    const angles = half.map((c, i) => (half[(i - 1 + n) % n] + c) * 180 / Math.PI);
+    return { area, angles };
   }
 };

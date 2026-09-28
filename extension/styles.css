@@ -431,6 +431,32 @@ h1.main-title {
   width: 64px;
 }
 
+/* Max / min area for current sides */
+.area-extremes {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #555;
+  text-align: left;
+}
+
+.area-extremes:empty {
+  display: none;
+}
+
+.area-extremes p {
+  margin: 4px 0;
+}
+
+.area-extremes .angles {
+  color: #888;
+}
+
+/* Entered value the shape can't close with yet */
+.input-group input.input-pending {
+  border-color: #f0ad4e;
+  background: #fff8e6;
+}
+
 /* Section headers */
 .section-header {
   font-size: 14px;
