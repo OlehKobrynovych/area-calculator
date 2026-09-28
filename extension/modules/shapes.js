@@ -47,47 +47,55 @@ window.Shapes = {
     return pts.map(p => ({ x: p.x - offsetX, y: p.y - offsetY }));
   },
 
-  // Side i changed: angles stay, two other sides are recomputed to close the shape.
-  // Returns false if the change is impossible (shape stays unchanged).
+  // Side i changed: all sides stay, only angles change to close the shape.
+  // Free angles are taken from the end of side i (vertex i+1) forward, wrapping around.
   handleSideLengthChange: function (index, newLength) {
     const state = window.AppState;
-    if (!state.points || state.points.length < 3 || !(newLength > 0)) return false;
+    const n = state.points ? state.points.length : 0;
+    if (n < 3 || !(newLength > 0)) return false;
 
     const C = window.Calculations;
     const lengths = C.getSideLengths(state.points);
     lengths[index] = newLength;
-    return this.applyGeometry(lengths, C.getInteriorAngles(state.points), index);
+    return this.closeByAngles(lengths, C.getInteriorAngles(state.points), (index + 1) % n, n);
   },
 
   // Angle at vertex i changed, all sides stay the same.
-  // With fixed sides exactly 3 other angles must change; the nearest following
-  // vertices are tried first, then farther ones up to the last.
+  // Free angles are the following vertices (i+1, i+2, ...), wrapping around; angle i is kept.
   handleAngleChange: function (index, newAngle) {
     const state = window.AppState;
     const n = state.points ? state.points.length : 0;
     if (n < 4 || !(newAngle > 0 && newAngle < 360)) return false;
 
     const C = window.Calculations;
-    const lengths = C.getSideLengths(state.points);
     const angles = C.getInteriorAngles(state.points);
     angles[index] = newAngle;
+    return this.closeByAngles(C.getSideLengths(state.points), angles, (index + 1) % n, n - 1);
+  },
+
+  // With fixed sides exactly 3 angles must change to close the polygon.
+  // Tries free vertices among the `count` vertices starting at `start`, nearest first;
+  // all other angles are kept. Returns false if impossible (shape stays unchanged).
+  closeByAngles: function (lengths, angles, start, count) {
+    const state = window.AppState;
+    const C = window.Calculations;
+    const n = lengths.length;
     const orientation = C.signedDoubleArea(state.points) >= 0 ? 1 : -1;
 
-    // Free joints as offsets after index: 1 <= a < b < c <= n-1, nearest first
-    const triples = [];
-    for (let c = 3; c < n; c++)
-      for (let b = 2; b < c; b++)
-        for (let a = 1; a < b; a++) triples.push([a, b, c]);
-
-    for (const [a, b, c] of triples) {
-      const j1 = (index + a) % n, j2 = (index + b) % n, j3 = (index + c) % n;
-      const pts = this.solveWithFreeJoints(lengths, angles, orientation, j1, j2, j3);
-      if (!pts || window.Drawing.hasSelfIntersection(pts)) continue;
-      if (Math.abs(C.getInteriorAngles(pts)[index] - newAngle) > 0.01) continue;
-      state.points = pts;
-      this.finalizeUpdate();
-      return true;
-    }
+    for (let c = 2; c < count; c++)
+      for (let b = 1; b < c; b++)
+        for (let a = 0; a < b; a++) {
+          const j1 = (start + a) % n, j2 = (start + b) % n, j3 = (start + c) % n;
+          const pts = this.solveWithFreeJoints(lengths, angles, orientation, j1, j2, j3);
+          if (!pts || window.Drawing.hasSelfIntersection(pts)) continue;
+          const got = C.getInteriorAngles(pts);
+          const kept = angles.every((ang, k) =>
+            k === j1 || k === j2 || k === j3 || Math.abs(got[k] - ang) < 0.01);
+          if (!kept) continue;
+          state.points = pts;
+          this.finalizeUpdate();
+          return true;
+        }
     return false;
   },
 
@@ -157,23 +165,6 @@ window.Shapes = {
       if (!window.Drawing.hasSelfIntersection(result)) return result;
     }
     return null;
-  },
-
-  applyGeometry: function (lengths, angles, lockedIndex) {
-    const state = window.AppState;
-    const C = window.Calculations;
-    const orientation = C.signedDoubleArea(state.points) >= 0 ? 1 : -1;
-    const dirs = C.directionsFromAngles(angles, C.getSideDirections(state.points)[0], orientation);
-
-    const candidates = C.solveClosure(lengths, dirs, lockedIndex);
-    const found = candidates
-      .map(l => C.buildPolygon(l, dirs, state.points[0]))
-      .find(pts => !window.Drawing.hasSelfIntersection(pts));
-    if (!found) return false;
-
-    state.points = found;
-    this.finalizeUpdate();
-    return true;
   },
 
   finalizeUpdate: function() {

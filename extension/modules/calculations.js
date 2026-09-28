@@ -83,59 +83,5 @@ window.Calculations = {
       while (turn <= -Math.PI) turn += 2 * Math.PI;
       return (Math.PI - s * turn) * 180 / Math.PI;
     });
-  },
-
-  // Side directions from interior angles, keeping side 0 direction and orientation
-  directionsFromAngles: function (angles, dir0, orientation) {
-    const dirs = [dir0];
-    for (let k = 1; k < angles.length; k++) {
-      dirs.push(dirs[k - 1] + orientation * (Math.PI - angles[k] * Math.PI / 180));
-    }
-    return dirs;
-  },
-
-  // Build points by walking sides from start point
-  buildPolygon: function (lengths, dirs, start) {
-    const pts = [{ x: start.x, y: start.y }];
-    for (let k = 0; k < lengths.length - 1; k++) {
-      const p = pts[k];
-      pts.push({ x: p.x + lengths[k] * Math.cos(dirs[k]), y: p.y + lengths[k] * Math.sin(dirs[k]) });
-    }
-    return pts;
-  },
-
-  // Close the polygon exactly: with fixed directions, recompute two sides (a, b)
-  // so that sum(L_k * u_k) = 0. Returns candidate length arrays, best first.
-  solveClosure: function (lengths, dirs, lockedIndex) {
-    const n = lengths.length;
-    const u = dirs.map(d => ({ x: Math.cos(d), y: Math.sin(d) }));
-    const candidates = [];
-
-    for (let a = 0; a < n; a++) {
-      for (let b = a + 1; b < n; b++) {
-        if (a === lockedIndex || b === lockedIndex) continue;
-        const det = u[a].x * u[b].y - u[a].y * u[b].x;
-        if (Math.abs(det) < 1e-9) continue;
-
-        let rx = 0, ry = 0;
-        for (let k = 0; k < n; k++) {
-          if (k === a || k === b) continue;
-          rx += lengths[k] * u[k].x;
-          ry += lengths[k] * u[k].y;
-        }
-        // Solve La * u[a] + Lb * u[b] = -R
-        const La = (-rx * u[b].y + ry * u[b].x) / det;
-        const Lb = (-u[a].x * ry + u[a].y * rx) / det;
-        if (La <= 1e-6 || Lb <= 1e-6) continue;
-
-        const cost = Math.abs(La - lengths[a]) / lengths[a] + Math.abs(Lb - lengths[b]) / lengths[b];
-        const result = [...lengths];
-        result[a] = La;
-        result[b] = Lb;
-        candidates.push({ cost, lengths: result });
-      }
-    }
-
-    return candidates.sort((x, y) => x.cost - y.cost).map(c => c.lengths);
   }
 };

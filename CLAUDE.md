@@ -75,9 +75,8 @@ After modifying code:
 ### Shape Model (sides + angles)
 
 - `points` are stored in cm; sides and interior angles are derived from them (`Calculations.getSideLengths` / `getInteriorAngles`)
-- Editing a side keeps all angles (two other sides adjust via `solveClosure`)
-- Editing angle i keeps all sides: exactly 3 other angles must change; `Shapes.handleAngleChange` tries the nearest following vertices first (i+1, i+2, i+3, then farther, wrapping to the first). Triangle angles are read-only
-- Closure: with fixed directions, `Calculations.solveClosure` recomputes two other sides (2×2 linear solve, positive lengths, smallest change, no self-intersection); impossible edits are rejected
+- Sides are never changed by closure — only angles. With fixed sides exactly 3 angles must change (`Shapes.closeByAngles` → `solveWithFreeJoints`), nearest following vertices first, wrapping around; no self-intersection; impossible edits are rejected
+- Editing side i: free angles start at vertex i+1. Editing angle i: angle i is kept, free angles start at i+1. Triangle angles are read-only
 - The cm/m switch only changes display, not geometry
 
 ### Coordinate System
