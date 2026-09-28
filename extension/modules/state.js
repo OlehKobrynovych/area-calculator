@@ -15,6 +15,8 @@ window.AppState = {
 
   // Results
   shapeArea: 0, // in cm2
+  tileLayout: null, // Calculations.getTileLayout result
+  showTileLayout: false,
 
   // Constants
   CM_TO_PX_SCALE: 1, // 1 unit = 1 pixel for simplicity in logical space
@@ -44,6 +46,7 @@ window.AppState = {
     this.points = [];
     this.isShapeClosed = false;
     this.shapeArea = 0;
+    this.tileLayout = null;
     this.scale = 1;
     this.offsetX = 0;
     this.offsetY = 0;

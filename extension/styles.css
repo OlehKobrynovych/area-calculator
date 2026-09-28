@@ -451,6 +451,28 @@ h1.main-title {
   color: #888;
 }
 
+/* Tile layout overlay toggle and whole/cut split (colors match the canvas) */
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.tile-split {
+  font-size: 12px;
+}
+
+.tile-full {
+  color: #28a745;
+}
+
+.tile-cut {
+  color: #fd7e14;
+}
+
 /* Entered value the shape can't close with yet */
 .input-group input.input-pending {
   border-color: #f0ad4e;

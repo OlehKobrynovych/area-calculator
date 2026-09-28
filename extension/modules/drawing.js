@@ -13,10 +13,12 @@ window.Drawing = {
     const canvas = state.canvas;
     const padding = 50;
 
-    // Find bounding box
+    // Find bounding box (tiles of the layout overlay stick out of the shape)
     let minX = Infinity, maxX = -Infinity;
     let minY = Infinity, maxY = -Infinity;
-    state.points.forEach(p => {
+    const layoutCorners = this.isLayoutVisible()
+      ? state.tileLayout.tiles.flatMap(t => t.corners) : [];
+    state.points.concat(layoutCorners).forEach(p => {
       minX = Math.min(minX, p.x);
       maxX = Math.max(maxX, p.x);
       minY = Math.min(minY, p.y);
@@ -65,6 +67,30 @@ window.Drawing = {
     } else {
       this.drawPolygon();
     }
+  },
+
+  // Layout is hidden while dragging: it is recalculated only after the shape settles
+  isLayoutVisible: function() {
+    const state = window.AppState;
+    return state.showTileLayout && !!state.tileLayout && !state.isDragging;
+  },
+
+  // Tiles over the shape: whole tiles green, cut tiles orange
+  drawTileLayout: function(toX, toY) {
+    const ctx = window.AppState.ctx;
+    ctx.lineWidth = 1;
+    window.AppState.tileLayout.tiles.forEach(t => {
+      ctx.beginPath();
+      t.corners.forEach((c, i) => {
+        if (i === 0) ctx.moveTo(toX(c.x), toY(c.y));
+        else ctx.lineTo(toX(c.x), toY(c.y));
+      });
+      ctx.closePath();
+      ctx.fillStyle = t.full ? "rgba(40, 167, 69, 0.25)" : "rgba(253, 126, 20, 0.25)";
+      ctx.strokeStyle = t.full ? "rgba(40, 167, 69, 0.8)" : "rgba(253, 126, 20, 0.8)";
+      ctx.fill();
+      ctx.stroke();
+    });
   },
 
   // Logical to Screen conversion
@@ -175,6 +201,8 @@ window.Drawing = {
       ctx.fill();
     }
 
+    if (this.isLayoutVisible()) this.drawTileLayout(x => this.tx(x), y => this.ty(y));
+
     ctx.strokeStyle = "#007bff";
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -208,17 +236,28 @@ window.Drawing = {
     const radius = state.circleRadius || 50;
     const padding = 50;
     const available = Math.min(state.canvas.width, state.canvas.height) - padding * 2;
-    const scale = available / (radius * 2);
+    // Fit the tiles too when the layout is shown (circle is centered at 0,0)
+    let extent = radius;
+    if (this.isLayoutVisible()) {
+      state.tileLayout.tiles.forEach(t => t.corners.forEach(c => {
+        extent = Math.max(extent, Math.abs(c.x), Math.abs(c.y));
+      }));
+    }
+    const scale = available / (extent * 2);
     const cx = state.canvas.width / 2;
     const cy = state.canvas.height / 2;
     const rPx = radius * scale;
 
     ctx.fillStyle = "rgba(0, 123, 255, 0.1)";
+    ctx.beginPath();
+    ctx.arc(cx, cy, rPx, 0, Math.PI * 2);
+    ctx.fill();
+    if (this.isLayoutVisible()) this.drawTileLayout(x => cx + x * scale, y => cy + y * scale);
+
     ctx.strokeStyle = "#007bff";
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(cx, cy, rPx, 0, Math.PI * 2);
-    ctx.fill();
     ctx.stroke();
     
     ctx.fillStyle = "#000";

@@ -33,25 +33,50 @@ document.addEventListener("DOMContentLoaded", () => {
     const perPack = Math.max(0, parseInt(state.unitsPerPackInput.value) || 0);
     const price = Math.max(0, parseFloat(state.materialPriceInput.value) || 0);
 
+    state.tileLayout = null;
+    const redrawLayout = () => {
+      if (state.showTileLayout) {
+        window.Drawing.updateTransform(true);
+        window.Drawing.redrawCanvas();
+      }
+    };
+
     if (width <= 0 || height <= 0) {
       state.materialResultDisplay.innerHTML = "";
       state.materialResultDisplay.style.display = "none";
+      redrawLayout();
       return;
     }
     if (state.shapeArea <= 0) {
       state.materialResultDisplay.style.display = "block";
       state.materialResultDisplay.innerHTML = `<p>${dict.hint_no_shape}</p>`;
+      redrawLayout();
       return;
     }
+
+    // Count tiles by actual layout (cut tiles count as whole); area formula only as fallback
+    const shapePoints = state.currentShapeMode === "circle"
+      ? window.Shapes.generateRegularPolygon(96, state.circleRadius)
+      : state.points;
+    state.tileLayout = window.Calculations.getTileLayout(shapePoints, width, height);
+    redrawLayout();
 
     const result = window.Calculations.calculateMaterialRequirements(
       state.shapeArea, width, height, perPack
     );
+    if (result && state.tileLayout) {
+      result.unitsNeeded = state.tileLayout.count;
+      result.packsNeeded = perPack > 0 ? Math.ceil(result.unitsNeeded / perPack) : 0;
+    }
 
     if (result) {
       state.materialResultDisplay.style.display = "block";
       const currency = dict.unit_currency;
       let html = `<p>${dict.result_needed}: <strong>${result.unitsNeeded}</strong> ${dict.unit_pcs}</p>`;
+      if (state.tileLayout) {
+        html += `<p class="tile-split"><span class="tile-full">${dict.result_full}: ${state.tileLayout.full}</span>, ` +
+          `<span class="tile-cut">${dict.result_cut}: ${state.tileLayout.cut}</span></p>`;
+      }
       if (perPack > 0) {
         html += `<p>${dict.result_packs}: <strong>${result.packsNeeded}</strong></p>`;
         if (price > 0) {
@@ -128,6 +153,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Material Inputs
   [state.materialWidthInput, state.materialHeightInput, state.unitsPerPackInput, state.materialPriceInput].forEach(input => {
     input.addEventListener("input", updateMaterialCalculation);
+  });
+
+  // Tile layout overlay on the canvas
+  document.getElementById("show-tile-layout").addEventListener("change", (e) => {
+    state.showTileLayout = e.target.checked;
+    window.Drawing.updateTransform(true);
+    window.Drawing.redrawCanvas();
   });
 
   // Initial UI Setup

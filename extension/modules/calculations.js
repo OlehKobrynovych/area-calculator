@@ -118,5 +118,116 @@ window.Calculations = {
     const half = th.map((t, i) => sign[i] * (Math.PI - t) / 2);
     const angles = half.map((c, i) => (half[(i - 1 + n) % n] + c) * 180 / Math.PI);
     return { area, angles };
+  },
+
+  // Clip polygon to half-plane a*x + b*y <= c (Sutherland–Hodgman step)
+  clipHalfPlane: function (pts, a, b, c) {
+    const out = [];
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i], q = pts[(i + 1) % pts.length];
+      const dp = a * p.x + b * p.y - c, dq = a * q.x + b * q.y - c;
+      if (dp <= 0) out.push(p);
+      if ((dp < 0 && dq > 0) || (dp > 0 && dq < 0)) {
+        const t = dp / (dp - dq);
+        out.push({ x: p.x + (q.x - p.x) * t, y: p.y + (q.y - p.y) * t });
+      }
+    }
+    return out;
+  },
+
+  // Tiles of a w×h grid (axis-aligned, origin ox/oy) that overlap the polygon
+  countGridTiles: function (pts, w, h, ox, oy, box, collect) {
+    const eps = w * h * 1e-6;
+    let full = 0, cut = 0;
+    const tiles = [];
+    const j0 = Math.floor((box.minY - oy) / h), j1 = Math.ceil((box.maxY - oy) / h);
+    for (let j = j0; j < j1; j++) {
+      const y0 = oy + j * h;
+      let row = this.clipHalfPlane(pts, 0, -1, -y0);
+      row = this.clipHalfPlane(row, 0, 1, y0 + h);
+      if (row.length < 3 || this.calculatePolygonArea(row) < eps) continue;
+      let rMin = Infinity, rMax = -Infinity;
+      row.forEach(p => { rMin = Math.min(rMin, p.x); rMax = Math.max(rMax, p.x); });
+      for (let i = Math.floor((rMin - ox) / w); i < Math.ceil((rMax - ox) / w); i++) {
+        const x0 = ox + i * w;
+        let cell = this.clipHalfPlane(row, -1, 0, -x0);
+        cell = this.clipHalfPlane(cell, 1, 0, x0 + w);
+        if (cell.length < 3) continue;
+        const a = this.calculatePolygonArea(cell);
+        if (a < eps) continue;
+        const isFull = a > w * h - eps * 10;
+        if (isFull) full++; else cut++;
+        if (collect) tiles.push({ x: x0, y: y0, full: isFull });
+      }
+    }
+    return { full, cut, count: full + cut, tiles };
+  },
+
+  // Best placement of w×h tiles covering the polygon: tries grid rotations along the
+  // sides and several offsets, minimizing the number of tiles (offcuts are not reused).
+  // Returns {count, full, cut, tiles: [{corners: [4 points], full}]} or null if too many tiles.
+  getTileLayout: function (points, w, h) {
+    const area = this.calculatePolygonArea(points);
+    if (!(area > 0) || !(w > 0) || !(h > 0)) return null;
+
+    // Grid angles: 0 and each side direction (mod 90°)
+    const angles = [0];
+    this.getSideDirections(points).forEach(d => {
+      const a = ((d % (Math.PI / 2)) + Math.PI / 2) % (Math.PI / 2);
+      if (!angles.some(b => Math.abs(a - b) < 1e-3 || Math.abs(a - b) > Math.PI / 2 - 1e-3)) angles.push(a);
+    });
+    const sizes = w === h ? [[w, h]] : [[w, h], [h, w]];
+
+    // Keep the work bounded for tiny tiles on large shapes
+    let box0 = { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity };
+    points.forEach(p => {
+      box0.minX = Math.min(box0.minX, p.x); box0.maxX = Math.max(box0.maxX, p.x);
+      box0.minY = Math.min(box0.minY, p.y); box0.maxY = Math.max(box0.maxY, p.y);
+    });
+    const diag = Math.hypot(box0.maxX - box0.minX, box0.maxY - box0.minY);
+    const tilesPerTry = (diag + w + h) * (diag + w + h) / (w * h);
+    if (tilesPerTry > 200000) return null;
+    const steps = tilesPerTry * angles.length * sizes.length * 25 > 400000 ? 1 : 4;
+
+    let best = null;
+    for (const t of angles) {
+      const cos = Math.cos(t), sin = Math.sin(t);
+      // Polygon in the grid frame
+      const rot = points.map(p => ({ x: p.x * cos + p.y * sin, y: -p.x * sin + p.y * cos }));
+      const box = { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity };
+      rot.forEach(p => {
+        box.minX = Math.min(box.minX, p.x); box.maxX = Math.max(box.maxX, p.x);
+        box.minY = Math.min(box.minY, p.y); box.maxY = Math.max(box.maxY, p.y);
+      });
+      for (const [tw, th] of sizes) {
+        // Offsets: grid aligned to min / max edge, plus fractions of a tile
+        const oxs = [box.minX, box.maxX], oys = [box.minY, box.maxY];
+        for (let k = 1; k < steps; k++) {
+          oxs.push(box.minX + k * tw / steps);
+          oys.push(box.minY + k * th / steps);
+        }
+        for (const ox of oxs)
+          for (const oy of oys) {
+            const r = this.countGridTiles(rot, tw, th, ox, oy, box, false);
+            if (!best || r.count < best.count || (r.count === best.count && r.full > best.full))
+              best = { ...r, t, tw, th, ox, oy, box, rot };
+          }
+      }
+    }
+
+    // Tile corners back in shape coordinates
+    const { tiles } = this.countGridTiles(best.rot, best.tw, best.th, best.ox, best.oy, best.box, true);
+    const cos = Math.cos(best.t), sin = Math.sin(best.t);
+    const back = (x, y) => ({ x: x * cos - y * sin, y: x * sin + y * cos });
+    return {
+      count: best.count,
+      full: best.full,
+      cut: best.cut,
+      tiles: tiles.map(tl => ({
+        full: tl.full,
+        corners: [back(tl.x, tl.y), back(tl.x + best.tw, tl.y),
+                  back(tl.x + best.tw, tl.y + best.th), back(tl.x, tl.y + best.th)]
+      }))
+    };
   }
 };
